@@ -101,6 +101,11 @@ func shoot_at_target(target: Node2D):
 
 func lock_on_target(target: Node2D):
 	print("Locking on target:", target.name)
+	if current_target == target:
+		# Already locked on, don't toggle off on second tap
+		print("Already locked on target:", target.name)
+		return
+
 	if current_target and current_target.has_method("set_locked"):
 		current_target.set_locked(false)
 

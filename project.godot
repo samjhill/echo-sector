@@ -19,6 +19,12 @@ config/icon="res://icon.svg"
 
 PlayerData="*res://playerData.gd"
 
+[display]
+
+window/size/viewport_width=648
+window/size/viewport_height=1152
+window/handheld/orientation=1
+
 [input]
 
 shoot={

@@ -44,5 +44,6 @@ offset_left = -1183.0
 offset_top = -1440.0
 offset_right = 5856.0
 offset_bottom = 5599.0
+mouse_filter = 2
 texture = ExtResource("8_rj586")
 stretch_mode = 1

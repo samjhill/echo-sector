@@ -14,6 +14,7 @@ script = ExtResource("1_epypp")
 enemy_scene = ExtResource("2_epypp")
 
 [node name="Player" parent="." instance=ExtResource("3_0hol4")]
+position = Vector2(200, 500)
 collision_layer = 2
 collision_mask = 2
 projectile_scene = ExtResource("4_0hol4")

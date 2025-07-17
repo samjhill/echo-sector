@@ -56,9 +56,9 @@ text = "Upgrades (Coming Soon)"
 
 [node name="TextureRect" type="TextureRect" parent="."]
 layout_mode = 0
-offset_left = -252.0
-offset_top = -20.0
-offset_right = 935.0
-offset_bottom = 1167.0
+offset_left = -433.0
+offset_top = -126.0
+offset_right = 1157.0
+offset_bottom = 1464.0
 mouse_filter = 2
 texture = ExtResource("2_fpkqt")

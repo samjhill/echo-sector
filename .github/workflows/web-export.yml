@@ -13,7 +13,16 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Set up Godot
+    - uses: chickensoft-games/setup-godot@v2
+      name: 🤖 Setup Godot
+      with:
+        # Version must include major, minor, and patch, and be >= 4.0.0
+        # Pre-release label is optional.
+        version: 4.4.1 # also valid: 4.0.0.rc1 or 4.0.0 or "global.json", etc
+        # Use .NET-enabled version of Godot (the default is also true).
+        use-dotnet: true
+
+    - name: Set up Godot Export
       uses: firebelley/godot-export@v6.0.0
       with:
         # Defining all the required inputs
@@ -22,7 +31,6 @@ jobs:
         relative_project_path: ./
         archive_output: true
         cache: true
-
 
     - name: Export project to HTML5
       run: |

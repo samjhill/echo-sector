@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://dec0onipaltl0"]
+[gd_scene load_steps=4 format=3 uid="uid://dec0onipaltl0"]
 
 [ext_resource type="Script" uid="uid://bms1x1aerl2q8" path="res://hangar.gd" id="1_2d16u"]
+[ext_resource type="Texture2D" uid="uid://c3a3pnv8sv4gt" path="res://hangar.png" id="2_fpkqt"]
+
+[sub_resource type="Theme" id="Theme_fpkqt"]
 
 [node name="Hangar" type="Control"]
 layout_mode = 3
@@ -12,17 +15,22 @@ grow_vertical = 2
 script = ExtResource("1_2d16u")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
+z_index = 1
 layout_mode = 0
-offset_left = 346.0
-offset_top = 223.0
-offset_right = 815.0
-offset_bottom = 431.0
+offset_left = 46.0
+offset_top = 878.0
+offset_right = 610.0
+offset_bottom = 1082.0
+alignment = 1
 
 [node name="CreditsLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 
 [node name="LaunchButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
+theme = SubResource("Theme_fpkqt")
+theme_override_font_sizes/font_size = 20
 text = "Launch"
 
 [node name="ShipLoadout" type="PanelContainer" parent="VBoxContainer"]
@@ -45,3 +53,12 @@ layout_mode = 2
 [node name="Label" type="Label" parent="VBoxContainer/UpgradePanel"]
 layout_mode = 2
 text = "Upgrades (Coming Soon)"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = -252.0
+offset_top = -20.0
+offset_right = 935.0
+offset_bottom = 1167.0
+mouse_filter = 2
+texture = ExtResource("2_fpkqt")

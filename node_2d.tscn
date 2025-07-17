@@ -21,13 +21,13 @@ projectile_scene = ExtResource("4_0hol4")
 
 [node name="Enemy" parent="." instance=ExtResource("2_epypp")]
 visible = false
+z_index = 1
 
 [node name="AbyssManager" type="Node" parent="."]
 script = ExtResource("5_q6r6c")
 exit_gate_scene = ExtResource("6_kdubu")
 
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
-visible = false
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
 motion_scale = Vector2(0.3, 0.3)

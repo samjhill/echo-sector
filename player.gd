@@ -112,4 +112,5 @@ func lock_on_target(target: Node2D):
 		fire_timer = 0.0  # Reset cooldown
 		if current_target.has_method("set_locked"):
 			current_target.set_locked(true)
+			print("locked onto:", target.name)
 		_set_target(target.global_position)

@@ -80,6 +80,7 @@ func _physics_process(delta):
 	move_and_slide()
 
 func _process(delta):
+	print("Current target:", current_target)
 	if current_target and is_instance_valid(current_target):
 		fire_timer += delta
 		if fire_timer >= fire_interval:
@@ -99,6 +100,7 @@ func shoot_at_target(target: Node2D):
 	get_tree().current_scene.add_child(bullet)
 
 func lock_on_target(target: Node2D):
+	print("Locking on target:", target.name)
 	if current_target and current_target.has_method("set_locked"):
 		current_target.set_locked(false)
 

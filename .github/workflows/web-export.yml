@@ -22,7 +22,7 @@ jobs:
         # Use .NET-enabled version of Godot (the default is also true).
         use-dotnet: true
 
-    - name: Set up Godot Export
+    - name: Godot Export
       uses: firebelley/godot-export@v6.0.0
       with:
         # Defining all the required inputs

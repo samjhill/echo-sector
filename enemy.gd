@@ -18,7 +18,7 @@ func set_locked(is_locked: bool):
 	$LockRing.visible = is_locked
 
 func _physics_process(delta):
-	var player = get_tree().get_first_node_in_group("player")
+	var player = get_tree().get_first_node_in_group("players")
 	if player and is_instance_valid(player):
 		var direction = (player.global_position - global_position).normalized()
 		velocity = direction * speed

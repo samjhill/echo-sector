@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://dec0onipaltl0"]
+[gd_scene load_steps=5 format=3 uid="uid://dec0onipaltl0"]
 
 [ext_resource type="Script" uid="uid://bms1x1aerl2q8" path="res://hangar.gd" id="1_2d16u"]
 [ext_resource type="Texture2D" uid="uid://c3a3pnv8sv4gt" path="res://hangar.png" id="2_fpkqt"]
+[ext_resource type="Script" uid="uid://0jvij7hxlk4s" path="res://texture_rect.gd" id="3_fqqng"]
 
 [sub_resource type="Theme" id="Theme_fpkqt"]
 
@@ -62,9 +63,10 @@ text = "Upgrades (Coming Soon)"
 
 [node name="TextureRect" type="TextureRect" parent="Hangar"]
 layout_mode = 0
-offset_left = -433.0
-offset_top = -126.0
-offset_right = 1157.0
-offset_bottom = 1464.0
+offset_left = -88.0
+offset_top = -376.0
+offset_right = 1502.0
+offset_bottom = 1214.0
 mouse_filter = 2
 texture = ExtResource("2_fpkqt")
+script = ExtResource("3_fqqng")

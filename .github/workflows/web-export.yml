@@ -12,6 +12,9 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v3
+    
+    - name: Set up build version
+      run: echo "const BUILD_VERSION := \"$(git rev-parse --short HEAD)\"" > build_version.gd
 
     - uses: chickensoft-games/setup-godot@v2
       name: 🤖 Setup Godot

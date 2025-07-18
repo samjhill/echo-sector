@@ -10,4 +10,5 @@ func _ready():
 
 func _on_return_pressed():
 	queue_free()
+
 	get_tree().change_scene_to_file("res://hangar.tscn")

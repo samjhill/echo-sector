@@ -1,0 +1,32 @@
+[gd_scene load_steps=3 format=3 uid="uid://bacogc2xxuel8"]
+
+[ext_resource type="Texture2D" uid="uid://xgmptlcb28gi" path="res://nebula.png" id="1_gt22q"]
+[ext_resource type="Script" uid="uid://wna6vvmlk4yj" path="res://game_over_screen.gd" id="1_w3hxg"]
+
+[node name="GameOverScreen" type="CanvasLayer"]
+script = ExtResource("1_w3hxg")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_left = -129.0
+offset_top = -69.0
+offset_right = 895.0
+offset_bottom = 1467.0
+texture = ExtResource("1_gt22q")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 30.0
+offset_top = 605.0
+offset_right = 625.0
+offset_bottom = 838.0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Game over"
+horizontal_alignment = 1
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 40
+text = "Return to hangar"

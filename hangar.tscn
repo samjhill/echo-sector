@@ -25,6 +25,10 @@ offset_right = 610.0
 offset_bottom = 1082.0
 alignment = 1
 
+[node name="BuildLabel" type="Label" parent="Hangar/VBoxContainer"]
+layout_mode = 2
+text = "3f6a7b1"
+
 [node name="CreditsLabel" type="Label" parent="Hangar/VBoxContainer"]
 layout_mode = 2
 

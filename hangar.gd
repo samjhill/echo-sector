@@ -2,6 +2,7 @@ extends Control
 
 func _ready():
 	PlayerData.load_game()
+	$BuildLabel.text = "Build: " + BuildVersion.BUILD_VERSION
 	$VBoxContainer/CreditsLabel.text = "Credits: " + str(PlayerData.credits)
 
 	$VBoxContainer/LaunchButton.pressed.connect(_on_launch_pressed)

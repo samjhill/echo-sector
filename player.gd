@@ -10,7 +10,7 @@ extends CharacterBody2D
 @export var max_health := 5
 
 @onready var camera = $Camera2D
-@onready var health_bar = $"../UI/HealthBar"
+@onready var health_bar = get_tree().root.get_node("Game/UI/HealthBar")
 
 var current_health := max_health
 var target_position: Vector2
@@ -43,6 +43,8 @@ func take_damage(amount: int):
 func update_health_ui():
 	if health_bar and health_bar.has_method("set_value"):
 		health_bar.set_value(current_health)
+		var label = health_bar.get_node("Label")
+		label.text = "%d / %d" % [current_health, max_health]
 
 func die():
 	print("Player has died. Game Over.")

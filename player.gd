@@ -9,6 +9,7 @@ extends CharacterBody2D
 @export var orbit_speed := 1.0  # radians per second
 @export var max_health := 5
 
+@onready var trajectory_line = $TrajectoryLine
 @onready var camera = $Camera2D
 @onready var health_bar = get_tree().root.get_node("Game/UI/HealthBar")
 
@@ -25,6 +26,7 @@ func _ready():
 	set_process_input(true)
 	add_to_group("players")
 	current_health = max_health
+	target_position = global_position
 	update_health_ui()
 
 func _input(event):
@@ -104,6 +106,16 @@ func _physics_process(delta):
 	move_and_slide()
 
 func _process(delta):
+	# Only draw the line if the target position is different from the current position
+	if global_position.distance_to(target_position) > 5:
+		trajectory_line.points = [
+			Vector2.ZERO,
+			to_local(target_position)
+		]
+		trajectory_line.visible = true
+	else:
+		trajectory_line.visible = false
+		
 	if current_target and is_instance_valid(current_target):
 		fire_timer += delta
 		if fire_timer >= fire_interval:

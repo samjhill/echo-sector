@@ -5,7 +5,9 @@
 
 [sub_resource type="Theme" id="Theme_fpkqt"]
 
-[node name="Hangar" type="Control"]
+[node name="Node2D" type="Node2D"]
+
+[node name="Hangar" type="Control" parent="."]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -14,7 +16,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_2d16u")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="VBoxContainer" type="VBoxContainer" parent="Hangar"]
 z_index = 1
 layout_mode = 0
 offset_left = 46.0
@@ -23,38 +25,38 @@ offset_right = 610.0
 offset_bottom = 1082.0
 alignment = 1
 
-[node name="CreditsLabel" type="Label" parent="VBoxContainer"]
+[node name="CreditsLabel" type="Label" parent="Hangar/VBoxContainer"]
 layout_mode = 2
 
-[node name="LaunchButton" type="Button" parent="VBoxContainer"]
+[node name="LaunchButton" type="Button" parent="Hangar/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 theme = SubResource("Theme_fpkqt")
 theme_override_font_sizes/font_size = 20
 text = "Launch"
 
-[node name="ShipLoadout" type="PanelContainer" parent="VBoxContainer"]
+[node name="ShipLoadout" type="PanelContainer" parent="Hangar/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/ShipLoadout"]
+[node name="Label" type="Label" parent="Hangar/VBoxContainer/ShipLoadout"]
 layout_mode = 2
 text = "Ship Loadout (wip)"
 
-[node name="DronePanel" type="PanelContainer" parent="VBoxContainer"]
+[node name="DronePanel" type="PanelContainer" parent="Hangar/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/DronePanel"]
+[node name="Label" type="Label" parent="Hangar/VBoxContainer/DronePanel"]
 layout_mode = 2
 text = "Drone Bay (wip)"
 
-[node name="UpgradePanel" type="PanelContainer" parent="VBoxContainer"]
+[node name="UpgradePanel" type="PanelContainer" parent="Hangar/VBoxContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="VBoxContainer/UpgradePanel"]
+[node name="Label" type="Label" parent="Hangar/VBoxContainer/UpgradePanel"]
 layout_mode = 2
 text = "Upgrades (Coming Soon)"
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="TextureRect" type="TextureRect" parent="Hangar"]
 layout_mode = 0
 offset_left = -433.0
 offset_top = -126.0

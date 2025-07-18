@@ -1,6 +1,6 @@
 extends Node
 
-@export var duration: float = 5.0
+@export var duration: float = 20.0
 @export var exit_gate_scene: PackedScene
 @export var player: NodePath
 var time_elapsed := 0.0
@@ -10,7 +10,12 @@ func _ready():
 	time_elapsed = 0.0
 	running = true
 	print("Abyssal zone started.")
+	$GameIntroLabel.text = "Survive for " + str(duration) + " seconds"
+	$HideLabelTimer.start()
 
+func _on_HideLabelTimer_timeout():
+	$GameIntroLabel.visible = false
+	
 func _process(delta):
 	if not running:
 		return

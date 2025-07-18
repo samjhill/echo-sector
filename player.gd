@@ -7,9 +7,12 @@ extends CharacterBody2D
 @export var rotation_speed := 5.0
 @export var orbit_radius := 180.0
 @export var orbit_speed := 1.0  # radians per second
+@export var max_health := 5
 
 @onready var camera = $Camera2D
+@onready var health_bar = get_tree().root.get_node("Game/UI/HealthBar")
 
+var current_health := max_health
 var target_position: Vector2
 var moving_to_target := false
 var orbiting := false
@@ -21,6 +24,8 @@ var fire_timer: float = 0.0
 func _ready():
 	set_process_input(true)
 	add_to_group("players")
+	current_health = max_health
+	update_health_ui()
 
 func _input(event):
 	if event is InputEventScreenTouch and event.pressed:
@@ -28,6 +33,25 @@ func _input(event):
 	elif event is InputEventMouseButton and event.pressed:
 		_set_target(event.position)
 
+func take_damage(amount: int):
+	print("player took damage", amount)
+	current_health -= amount
+	update_health_ui()
+	if current_health <= 0:
+		die()
+		
+func update_health_ui():
+	if health_bar and health_bar.has_method("set_value"):
+		health_bar.set_value(current_health)
+		var label = health_bar.get_node("Label")
+		label.text = "%d / %d" % [current_health, max_health]
+
+func die():
+	print("Player has died. Game Over.")
+	var game_over_screen = preload("res://game_over_screen.tscn").instantiate()
+	get_tree().root.add_child(game_over_screen)
+	queue_free()
+	
 func _set_target(pos: Vector2):
 	target_position = pos
 	moving_to_target = true
@@ -80,7 +104,6 @@ func _physics_process(delta):
 	move_and_slide()
 
 func _process(delta):
-	print("Current target:", current_target)
 	if current_target and is_instance_valid(current_target):
 		fire_timer += delta
 		if fire_timer >= fire_interval:
@@ -101,6 +124,11 @@ func shoot_at_target(target: Node2D):
 
 func lock_on_target(target: Node2D):
 	print("Locking on target:", target.name)
+	if current_target == target:
+		# Already locked on, don't toggle off on second tap
+		print("Already locked on target:", target.name)
+		return
+
 	if current_target and current_target.has_method("set_locked"):
 		current_target.set_locked(false)
 
@@ -112,4 +140,5 @@ func lock_on_target(target: Node2D):
 		fire_timer = 0.0  # Reset cooldown
 		if current_target.has_method("set_locked"):
 			current_target.set_locked(true)
+			print("locked onto:", target.name)
 		_set_target(target.global_position)

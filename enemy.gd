@@ -5,7 +5,10 @@ extends CharacterBody2D
 @export var color: Color = Color.RED
 @onready var sprite := $Sprite2D
 @export var damage_number_scene: PackedScene
+@export var fire_interval := 5
+@export var projectile_scene: PackedScene
 
+var fire_timer := 0.0
 var health: int
 
 func _ready():
@@ -23,6 +26,20 @@ func _physics_process(delta):
 		var direction = (player.global_position - global_position).normalized()
 		velocity = direction * speed
 		move_and_slide()
+
+		# Handle firing
+		fire_timer += delta
+		if fire_timer >= fire_interval:
+			fire_timer = 0.0
+			shoot_at(player)
+
+func shoot_at(player: Node2D):
+	if not projectile_scene:
+		return
+	var bullet = projectile_scene.instantiate()
+	bullet.global_position = global_position
+	bullet.direction = (player.global_position - global_position).normalized()
+	get_tree().current_scene.add_child(bullet)
 
 func take_damage(amount: int):
 	health -= amount

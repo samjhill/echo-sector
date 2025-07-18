@@ -1,3 +1,5 @@
 # Auto-generated during build
-const BUILD_VERSION := "4114227"
-const BUILD_TIMESTAMP := "2025-07-18 13:42:38"
+extends Node
+
+var BUILD_VERSION := "4114227"
+var BUILD_TIMESTAMP := "2025-07-18 13:42:38"

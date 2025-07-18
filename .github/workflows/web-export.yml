@@ -24,9 +24,12 @@ jobs:
 
       - name: Download export templates
         run: |
-          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
-          wget https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz -O templates.tpz
-          unzip templates.tpz -d ~/.local/share/godot/export_templates/4.4.1.stable
+            mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+            wget https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz -O templates.tpz
+            unzip templates.tpz -d extracted_templates
+            cp extracted_templates/templates/web/*.zip ~/.local/share/godot/export_templates/4.4.1.stable/
+
+
 
       - name: Export HTML5
         run: |

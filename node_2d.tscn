@@ -28,6 +28,19 @@ z_index = 1
 script = ExtResource("5_q6r6c")
 exit_gate_scene = ExtResource("6_kdubu")
 
+[node name="GameIntroLabel" type="Label" parent="AbyssManager"]
+offset_left = -123.0
+offset_top = 66.0
+offset_right = 524.0
+offset_bottom = 137.0
+theme_override_font_sizes/font_size = 40
+text = "Survive for 30 seconds"
+horizontal_alignment = 1
+
+[node name="HideLabelTimer" type="Timer" parent="AbyssManager"]
+wait_time = 3.0
+one_shot = true
+
 [node name="ParallaxBackground" type="ParallaxBackground" parent="."]
 
 [node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground"]
@@ -71,3 +84,5 @@ offset_right = 92.0
 offset_bottom = 34.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+
+[connection signal="timeout" from="AbyssManager/HideLabelTimer" to="AbyssManager" method="_on_HideLabelTimer_timeout"]

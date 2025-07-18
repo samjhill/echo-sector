@@ -5,7 +5,7 @@ extends CharacterBody2D
 @export var color: Color = Color.RED
 @onready var sprite := $Sprite2D
 @export var damage_number_scene: PackedScene
-@export var fire_interval := 1
+@export var fire_interval := 5
 @export var projectile_scene: PackedScene
 
 var fire_timer := 0.0

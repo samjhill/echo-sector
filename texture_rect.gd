@@ -1,6 +1,6 @@
 extends TextureRect
 
-@export var scroll_speed: float = 20.0 # pixels per second
+@export var scroll_speed: float = 15.0 # pixels per second
 
 var start_position: Vector2
 var max_offset: float
@@ -13,9 +13,5 @@ func _ready():
 	set_clip_contents(true)
 
 func _process(delta):
-	if position.x < -(max_offset):
-		print("moving")
+	if position.x > max_offset:
 		position.x -= scroll_speed * delta
-	else:
-		print("bg x", position.x)
-		print("offset", -(max_offset))

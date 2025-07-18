@@ -22,13 +22,12 @@ jobs:
           version: 4.4.1
           use-dotnet: false
 
-      - name: Download export templates
+      - name: Download and extract export templates
         run: |
             mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
             wget https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz -O templates.tpz
             unzip templates.tpz -d extracted_templates
-            cp extracted_templates/templates/web/*.zip ~/.local/share/godot/export_templates/4.4.1.stable/
-
+            cp extracted_templates/templates/web_*.zip ~/.local/share/godot/export_templates/4.4.1.stable/
 
 
       - name: Export HTML5

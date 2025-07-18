@@ -2,9 +2,9 @@
 
 **Echo Sector** is a chill, strategic 2D space survival shooter inspired by the Abyssal Deadspace runs in *EVE Online*. You pilot a modular ship with autonomous drones and fight your way through randomized enemies in an eerie, collapsing sector of space.
 
-The game is designed to be highly playable on both **mobile** and **desktop**, with tap-to-target and orbit-style movement mechanics.
+The game is designed to be highly playable on both mobile and desktop, with tap-to-target and orbit-style movement mechanics.
 
-[▶️ Play Now](https://samjhill.github.io/echo-sector/web/)
+[▶️ Play Now](https://samjhill.github.io/echo-sector/)
 
 ---
 

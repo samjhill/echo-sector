@@ -10,33 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v3
-    
-    - name: Set up build version
-      run: bash ${GITHUB_WORKSPACE}/generate_build_version.sh
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - uses: chickensoft-games/setup-godot@v2
-      name: 🤖 Setup Godot
-      with:
-        # Version must include major, minor, and patch, and be >= 4.0.0
-        # Pre-release label is optional.
-        version: 4.4.1 # also valid: 4.0.0.rc1 or 4.0.0 or "global.json", etc
-        # Use .NET-enabled version of Godot (the default is also true).
-        use-dotnet: true
+      - name: Set up build version
+        run: bash ${GITHUB_WORKSPACE}/generate_build_version.sh
 
-    - name: Godot Export
-      uses: firebelley/godot-export@v6.0.0
-      with:
-        # Defining all the required inputs
-        godot_executable_download_url: https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_linux.x86_64.zip
-        godot_export_templates_download_url: https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz
-        relative_project_path: ./
-        cache: true
+      - name: Setup Godot
+        uses: chickensoft-games/setup-godot@v2
+        with:
+          version: 4.4.1
+          use-dotnet: false
 
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./
-        publish_branch: gh-pages
+      - name: Download export templates
+        run: |
+          mkdir -p ~/.local/share/godot/export_templates/4.4.1.stable
+          wget https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable/Godot_v4.4.1-stable_export_templates.tpz -O templates.tpz
+          unzip templates.tpz -d ~/.local/share/godot/export_templates/4.4.1.stable
+
+      - name: Export HTML5
+        run: |
+          godot --headless --export-release "Web" index.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build/web
+          publish_branch: gh-pages

@@ -32,6 +32,7 @@ jobs:
 
       - name: Export HTML5
         run: |
+          mkdir build
           godot --headless --export-release "Web" build/index.html
 
       - name: Deploy to GitHub Pages

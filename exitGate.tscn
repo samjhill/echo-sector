@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://cxvlsyvf0locr" path="res://portal.png" id="2_yxllx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yxllx"]
-radius = 53.3385
+radius = 167.863
 
 [node name="Area2D" type="Area2D"]
 collision_layer = 2
@@ -12,7 +12,7 @@ collision_mask = 2
 script = ExtResource("1_qadmq")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-scale = Vector2(0.1, 0.1)
+scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_yxllx")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -20,8 +20,8 @@ position = Vector2(0, -3)
 shape = SubResource("CircleShape2D_yxllx")
 
 [node name="Label" type="Label" parent="."]
-offset_left = -40.0
-offset_top = 66.0
-offset_right = 40.0
-offset_bottom = 89.0
+offset_left = -38.0
+offset_top = 212.0
+offset_right = 42.0
+offset_bottom = 235.0
 text = "Exit portal"

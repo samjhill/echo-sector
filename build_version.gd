@@ -1,2 +1,3 @@
-# build_version.gd (auto-generated)
-const BUILD_VERSION := "3f6a7b1"
+# Auto-generated during build
+const BUILD_VERSION := "4114227"
+const BUILD_TIMESTAMP := "2025-07-18 13:42:38"

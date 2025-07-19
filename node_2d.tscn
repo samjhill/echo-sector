@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cshpcj3cn5ss3"]
+[gd_scene load_steps=11 format=3 uid="uid://cshpcj3cn5ss3"]
 
 [ext_resource type="Script" uid="uid://cm24cv2ae8wh5" path="res://main.gd" id="1_epypp"]
 [ext_resource type="PackedScene" uid="uid://c1mhc7besptjh" path="res://enemy.tscn" id="2_epypp"]
@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://3cskooh7553h" path="res://exitGate.tscn" id="6_kdubu"]
 [ext_resource type="Texture2D" uid="uid://d1jbu5nbuijs1" path="res://starmap.png" id="7_d21ai"]
 [ext_resource type="Texture2D" uid="uid://b5yswutk2ywoo" path="res://starfield.png" id="8_rj586"]
+[ext_resource type="Script" uid="uid://bxrf02kgosrf5" path="res://inventory_ui.gd" id="9_4d7sh"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rj586"]
 bg_color = Color(0.794921, 0.676217, 0.96922, 1)
@@ -84,5 +85,27 @@ offset_right = 92.0
 offset_bottom = 34.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+
+[node name="InventoryUI" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("9_4d7sh")
+
+[node name="ItemGrid" type="GridContainer" parent="InventoryUI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Tooltip" type="Panel" parent="InventoryUI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Label" type="Label" parent="InventoryUI/Tooltip"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
 
 [connection signal="timeout" from="AbyssManager/HideLabelTimer" to="AbyssManager" method="_on_HideLabelTimer_timeout"]

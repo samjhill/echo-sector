@@ -2,9 +2,18 @@ extends Node
 
 var credits: int = 0
 var unlocked_ships: Array[StringName] = []
+var inventory: Array = []
 
 const SAVE_FILE_PATH := "user://save_data.json"
 
+func _ready():
+	var test_item = {
+		"name": "Plasma Core",
+		"description": "Used in advanced weaponry",
+		"icon": preload("res://items/plasma-core.png")
+	}
+	inventory.append(test_item)
+	
 func save_game():
 	var data = {
 		"credits": credits,

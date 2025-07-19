@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 PlayerData="*res://playerData.gd"
 BuildVersion="*res://build_version.gd"
+PlayerInventory="*res://inventory.gd"
 
 [display]
 

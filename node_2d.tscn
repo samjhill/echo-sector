@@ -88,6 +88,7 @@ theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 
 [node name="InventoryUI" type="Control" parent="."]
 visible = false
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 3
 anchors_preset = 0
 offset_right = 40.0
@@ -96,8 +97,10 @@ script = ExtResource("9_4d7sh")
 
 [node name="ItemGrid" type="GridContainer" parent="InventoryUI"]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 24.0
+offset_right = 504.0
+offset_bottom = 297.0
+columns = 4
 
 [node name="Tooltip" type="Panel" parent="InventoryUI"]
 offset_right = 40.0

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://djx3yo164xjrr"]
+[gd_scene load_steps=4 format=3 uid="uid://djx3yo164xjrr"]
 
 [ext_resource type="Script" uid="uid://bl6ulwxwiukyv" path="res://win_screen.gd" id="1_l2arl"]
 [ext_resource type="Texture2D" uid="uid://d1jbu5nbuijs1" path="res://starmap.png" id="2_wmwda"]
+[ext_resource type="AudioStream" uid="uid://cfij5oxsoruqf" path="res://music/echo-sector-victory.wav" id="3_l5t5q"]
 
 [node name="WinScreen" type="Control"]
 layout_mode = 3
@@ -53,3 +54,7 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_font_sizes/font_size = 30
 text = "Return to hangar"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_l5t5q")
+autoplay = true

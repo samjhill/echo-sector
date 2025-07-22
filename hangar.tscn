@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://dec0onipaltl0"]
+[gd_scene load_steps=7 format=3 uid="uid://dec0onipaltl0"]
 
 [ext_resource type="Script" uid="uid://bms1x1aerl2q8" path="res://hangar.gd" id="1_2d16u"]
 [ext_resource type="Texture2D" uid="uid://c3a3pnv8sv4gt" path="res://hangar.png" id="2_fpkqt"]
 [ext_resource type="Script" uid="uid://0jvij7hxlk4s" path="res://texture_rect.gd" id="3_fqqng"]
 [ext_resource type="Texture2D" uid="uid://5u8fy74kqjg5" path="res://logo.png" id="4_34qk5"]
+[ext_resource type="AudioStream" uid="uid://003h3gk0kijo" path="res://music/echo-sector-hangar-screen.wav" id="5_afel3"]
 
 [sub_resource type="Theme" id="Theme_fpkqt"]
 
@@ -79,3 +80,7 @@ offset_right = 580.0
 offset_bottom = 729.0
 texture = ExtResource("4_34qk5")
 expand_mode = 1
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_afel3")
+autoplay = true

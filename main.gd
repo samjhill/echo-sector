@@ -25,10 +25,12 @@ func _on_spawn_enemy():
 			enemy.speed = 120
 			enemy.max_health = 2
 			enemy.color = Color.YELLOW # Fast
+			enemy.fire_interval = 1
 		2:
 			enemy.speed = 100
 			enemy.max_health = 3
 			enemy.color = Color.RED # Balanced
+			enemy.fire_interval = 3
 
 	# Spawn enemy at screen edge
 	var screen_size = get_viewport_rect().size

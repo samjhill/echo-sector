@@ -1,9 +1,15 @@
 # enemy_projectile.gd
 extends Area2D
 
+@export var color: Color = Color.RED
 @export var speed := 300.0
+@onready var sprite := $Sprite2D
+
 var direction := Vector2.ZERO
 
+func _ready():
+	sprite.modulate = color
+	
 func _process(delta):
 	position += direction * speed * delta
 

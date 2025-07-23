@@ -42,12 +42,12 @@ theme = SubResource("Theme_fpkqt")
 theme_override_font_sizes/font_size = 20
 text = "Launch"
 
-[node name="ShipLoadout" type="PanelContainer" parent="Hangar/VBoxContainer"]
+[node name="ShipLoadoutButton" type="Button" parent="Hangar/VBoxContainer"]
 layout_mode = 2
-
-[node name="Label" type="Label" parent="Hangar/VBoxContainer/ShipLoadout"]
-layout_mode = 2
-text = "Ship Loadout (wip)"
+size_flags_vertical = 3
+theme = SubResource("Theme_fpkqt")
+theme_override_font_sizes/font_size = 20
+text = "Ship Loadout"
 
 [node name="DronePanel" type="PanelContainer" parent="Hangar/VBoxContainer"]
 layout_mode = 2

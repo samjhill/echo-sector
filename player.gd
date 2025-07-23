@@ -8,17 +8,20 @@ extends CharacterBody2D
 @export var orbit_radius := 180.0
 @export var orbit_speed := 1.0  # radians per second
 @export var max_health := 5
+@export var engine_component: ShipComponent
+@export var weapon_components: Array[ShipComponent]
+
 
 @onready var trajectory_line = $TrajectoryLine
 @onready var camera = $Camera2D
 @onready var health_bar = get_tree().root.get_node("Game/UI/HealthBar")
 
+var weapon_cooldowns := []
 var current_health := max_health
 var target_position: Vector2
 var moving_to_target := false
 var orbiting := false
 var orbit_angle := 0.0
-
 var current_target: Node2D = null
 var fire_timer: float = 0.0
 
@@ -28,6 +31,13 @@ func _ready():
 	current_health = max_health
 	target_position = global_position
 	update_health_ui()
+	
+	var laser = LaserWeapon.new()
+	weapon_components.append(laser)
+	weapon_cooldowns.resize(weapon_components.size())
+	
+	for i in weapon_cooldowns.size():
+		weapon_cooldowns[i] = laser.cooldown
 
 func _input(event):
 	if event is InputEventScreenTouch and event.pressed:
@@ -117,12 +127,35 @@ func _process(delta):
 		trajectory_line.visible = false
 		
 	if current_target and is_instance_valid(current_target):
+		print("delta", delta)
 		fire_timer += delta
 		if fire_timer >= fire_interval:
 			fire_timer = 0.0
 			shoot_at_target(current_target)
+		
+		
+		for i in weapon_components.size():
+			print("weapon_cooldowns", weapon_cooldowns)
+			var weapon = weapon_components[i]
+			if weapon is LaserWeapon and current_target:
+				weapon_cooldowns[i] += delta
+				if weapon_cooldowns[i] >= weapon.cooldown:
+					weapon_cooldowns[i] = 0.0
+					shoot_laser(weapon, current_target)
 	else:
 		current_target = null
+
+func shoot_laser(weapon: LaserWeapon, target: Node2D):
+	var laser = preload("res://laser_projectile.tscn").instantiate()
+	
+	var direction = (target.global_position - global_position).normalized()
+	laser.global_position = global_position
+	laser.direction = direction
+	laser.rotation = direction.angle()  # 🔥 THIS ROTATES IT
+	
+	laser.damage = weapon.damage
+	get_tree().current_scene.add_child(laser)
+
 
 func shoot_at_target(target: Node2D):
 	if not projectile_scene:

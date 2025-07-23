@@ -1,7 +1,6 @@
 extends Node
 
 var credits: int = 0
-#var unlocked_ships: Array[StringName] = []
 var inventory: Array = []
 var equipped_components: Dictionary = {}
 
@@ -27,8 +26,8 @@ func save_game():
 
 	var data = {
 		"credits": credits,
-		#"unlocked_ships": unlocked_ships,
-		"inventory": serialized_inventory
+		"inventory": serialized_inventory,
+		"equipment": equipped_components
 	}
 
 	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.WRITE)
@@ -47,15 +46,14 @@ func load_game():
 	var result = JSON.parse_string(content)
 	if result is Dictionary:
 		credits = result.get("credits", 0)
-		#unlocked_ships = result.get("unlocked_ships", [])
-		
+
 		inventory.clear()
 		var starter_items = [
 			{
-			  "name": "Pulse Laser Mk I",
-			  "description": "Entry-level laser cannon",
-			  "slot_type": "weapon",
-			  "icon_path": "res://items/pulse_laser.png"
+				"name": "Pulse Laser Mk I",
+				"description": "Entry-level laser cannon",
+				"slot_type": "weapon",
+				"icon_path": "res://items/pulse_laser.png"
 			},
 			{
 				"name": "Basic Thruster",
@@ -77,13 +75,18 @@ func load_game():
 			if item["icon_path"] != "":
 				item["icon"] = load(item["icon_path"])
 			inventory.append(item)
-			
+
 		var loaded_equipment = result.get("equipment", starter_items)
 		for item in loaded_equipment:
-			var slot_type = item["slot_type"]
-			equipped_components[slot_type] = item
-			if item["icon_path"] != "":
-				item["icon"] = load(item["icon_path"])
-				
-			
-		
+			var item_data = loaded_equipment[item]
+			var slot_type = item_data["slot_type"]
+			#if item["icon_path"] != "":
+				#item["icon"] = load(item["icon_path"])
+			equipped_components[slot_type] = item_data
+
+func get_equipped_weapons() -> Array:
+	var weapons := []
+	for slot_type in equipped_components:
+		if equipped_components[slot_type].get("slot_type", "") == "weapon":
+			weapons.append(equipped_components[slot_type])
+	return weapons

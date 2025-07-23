@@ -30,18 +30,30 @@ func _ready():
 	add_to_group("players")
 	current_health = max_health
 	target_position = global_position
-	# UI related items
 	update_health_ui()
 	
-	var laser = LaserWeapon.new()
-	weapon_components.append(laser)
+	# Engine
+	#match player_data.equipped_engine:
+		#"basic_engine":
+			#engine_component = EngineComponent.new()
+		#_:
+			#engine_component = null
+
+	# Weapons
+	weapon_components.clear()
+	for weapon in PlayerData.get_equipped_weapons():
+		var weapon_name = weapon["name"]
+		match weapon_name:
+			"Pulse Laser Mk I":
+				weapon_components.append(LaserWeapon.new())
+			_:  # Unknown or unassigned
+				print("Unknown weapon:", weapon_name)
+
+	# Set up cooldowns for equipped weapons
 	weapon_cooldowns.resize(weapon_components.size())
-	
-	var engine = EngineComponent.new()
-	weapon_components.append(engine)
-	
 	for i in weapon_cooldowns.size():
-		weapon_cooldowns[i] = laser.cooldown
+		weapon_cooldowns[i] = 0.0
+
 
 func _input(event):
 	if event is InputEventScreenTouch and event.pressed:
@@ -50,7 +62,6 @@ func _input(event):
 		_set_target(event.position)
 
 func take_damage(amount: int):
-	print("player took damage", amount)
 	current_health -= amount
 	update_health_ui()
 	if current_health <= 0:
@@ -131,15 +142,13 @@ func _process(delta):
 		trajectory_line.visible = false
 		
 	if current_target and is_instance_valid(current_target):
-		print("delta", delta)
 		fire_timer += delta
 		if fire_timer >= fire_interval:
 			fire_timer = 0.0
-			shoot_at_target(current_target)
+			#shoot_at_target(current_target)
 		
 		
 		for i in weapon_components.size():
-			print("weapon_cooldowns", weapon_cooldowns)
 			var weapon = weapon_components[i]
 			if weapon is LaserWeapon and current_target:
 				weapon_cooldowns[i] += delta
@@ -155,7 +164,7 @@ func shoot_laser(weapon: LaserWeapon, target: Node2D):
 	var direction = (target.global_position - global_position).normalized()
 	laser.global_position = global_position
 	laser.direction = direction
-	laser.rotation = direction.angle()  # 🔥 THIS ROTATES IT
+	laser.rotation = direction.angle()
 	
 	laser.damage = weapon.damage
 	get_tree().current_scene.add_child(laser)

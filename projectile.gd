@@ -15,6 +15,5 @@ func _on_body_entered(body):
 		return
 
 	if body.has_method("take_damage"):
-		print("Hit:", body.name)
 		body.take_damage(damage)
 		queue_free()

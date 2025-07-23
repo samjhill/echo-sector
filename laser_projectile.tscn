@@ -18,3 +18,5 @@ position = Vector2(456, 2)
 shape = SubResource("RectangleShape2D_mj24a")
 
 [node name="Timer" type="Timer" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

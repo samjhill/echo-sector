@@ -1,6 +1,9 @@
-[gd_scene load_steps=2 format=3 uid="uid://1mm73hyamymw"]
+[gd_scene load_steps=5 format=3 uid="uid://1mm73hyamymw"]
 
 [ext_resource type="Script" uid="uid://b7666okqomuqy" path="res://ship_equipment_screen.gd" id="1_mh0ax"]
+[ext_resource type="Texture2D" uid="uid://bpvjcny3uldx" path="res://items/pulse_laser.png" id="2_sbil3"]
+[ext_resource type="Texture2D" uid="uid://dxbh7p4bppoyc" path="res://plasma-core.png" id="3_2pvc6"]
+[ext_resource type="Texture2D" uid="uid://h7p55begfy5q" path="res://items/basic_thruster.png" id="4_61cns"]
 
 [node name="ShipEquipmentScreen" type="Control"]
 layout_mode = 3
@@ -41,6 +44,8 @@ layout_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/WeaponSlots/Slot1"]
 layout_mode = 2
+texture = ExtResource("2_sbil3")
+expand_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/WeaponSlots/Slot1"]
 layout_mode = 2
@@ -55,6 +60,8 @@ layout_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/WeaponSlots/Slot2"]
 layout_mode = 2
+texture = ExtResource("3_2pvc6")
+expand_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/WeaponSlots/Slot2"]
 layout_mode = 2
@@ -69,6 +76,8 @@ layout_mode = 2
 
 [node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/EngineSlot"]
 layout_mode = 2
+texture = ExtResource("4_61cns")
+expand_mode = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/EngineSlot"]
 layout_mode = 2

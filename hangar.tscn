@@ -79,6 +79,7 @@ visible = false
 layout_mode = 1
 
 [node name="Logo" type="TextureRect" parent="Hangar"]
+layout_mode = 0
 offset_left = 47.0
 offset_top = 196.0
 offset_right = 580.0

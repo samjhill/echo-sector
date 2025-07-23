@@ -1,0 +1,69 @@
+[gd_scene load_steps=2 format=3 uid="uid://1mm73hyamymw"]
+
+[ext_resource type="Script" uid="uid://b7666okqomuqy" path="res://ship_equipment_screen.gd" id="1_mh0ax"]
+
+[node name="ShipEquipmentScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mh0ax")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 329.0
+offset_right = 629.0
+offset_bottom = 638.0
+
+[node name="Label" type="Label" parent="Panel"]
+layout_mode = 0
+offset_left = 22.0
+offset_right = 319.0
+offset_bottom = 45.0
+theme_override_font_sizes/font_size = 30
+text = "Ship Equipment"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 81.0
+offset_right = 584.0
+offset_bottom = 412.0
+
+[node name="WeaponSlots" type="VBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer/WeaponSlots"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/WeaponSlots/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/WeaponSlots/HBoxContainer"]
+layout_mode = 2
+text = "Weapon Slot 1"
+
+[node name="Button" type="Button" parent="Panel/VBoxContainer/WeaponSlots/HBoxContainer"]
+layout_mode = 2
+text = "Change"
+
+[node name="EngineSlot" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/EngineSlot"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="Panel/VBoxContainer/EngineSlot"]
+layout_mode = 2
+text = "Engine Slot"
+
+[node name="Button" type="Button" parent="Panel/VBoxContainer/EngineSlot"]
+layout_mode = 2
+text = "Change"
+
+[node name="Button" type="Button" parent="Panel/VBoxContainer"]
+layout_mode = 2
+text = "Close"

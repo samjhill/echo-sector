@@ -8,7 +8,7 @@ extends CharacterBody2D
 @export var orbit_radius := 180.0
 @export var orbit_speed := 1.0  # radians per second
 @export var max_health := 5
-@export var engine_component: ShipComponent
+@export var engine_component: EngineComponent
 @export var weapon_components: Array[ShipComponent]
 
 
@@ -30,11 +30,15 @@ func _ready():
 	add_to_group("players")
 	current_health = max_health
 	target_position = global_position
+	# UI related items
 	update_health_ui()
 	
 	var laser = LaserWeapon.new()
 	weapon_components.append(laser)
 	weapon_cooldowns.resize(weapon_components.size())
+	
+	var engine = EngineComponent.new()
+	weapon_components.append(engine)
 	
 	for i in weapon_cooldowns.size():
 		weapon_cooldowns[i] = laser.cooldown

@@ -4,6 +4,7 @@ extends Area2D
 @export var direction := Vector2.RIGHT
 @export var damage := 10
 @export var lifetime := 2.0  # seconds
+@export var slot_type: String = "weapon"
 
 func _ready():
 	$Timer.wait_time = lifetime

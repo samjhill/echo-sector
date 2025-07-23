@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="EngineComponent" load_steps=2 format=3 uid="uid://dd6pjdsa8v125"]
+
+[ext_resource type="Script" uid="uid://c2tq53tjbh8vv" path="res://components/engine_component.gd" id="1_lq4qh"]
+
+[resource]
+script = ExtResource("1_lq4qh")
+name = "Basic Engine"
+move_speed_bonus = 100.0
+rotation_speed_bonus = 2.0

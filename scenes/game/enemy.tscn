@@ -29,5 +29,6 @@ shape = SubResource("CircleShape2D_q6r6c")
 visible = false
 z_index = 10
 position = Vector2(-4.00001, -1.00001)
-scale = Vector2(0.197998, 0.197998)
+scale = Vector2(0.25, 0.25)
+modulate = Color(0, 1, 0, 0.8)
 texture = ExtResource("3_qi2p4")

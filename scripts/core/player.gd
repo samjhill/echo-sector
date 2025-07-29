@@ -33,6 +33,10 @@ var shake_timer := 0.0
 var shake_intensity := 5.0
 var original_camera_position: Vector2
 
+# Trajectory line animation variables
+var trajectory_animation_tween: Tween
+var trajectory_alpha: float = 0.0
+
 func _ready():
 	set_process_input(true)
 	add_to_group("players")
@@ -43,6 +47,15 @@ func _ready():
 	# Store original sprite and camera properties for hit effects
 	original_sprite_modulate = sprite.modulate
 	original_camera_position = camera.position
+	
+	# Set up trajectory line styling
+	if trajectory_line:
+		trajectory_line.width = 3.0
+		trajectory_line.default_color = Color(0, 1, 0, 0.8)  # Green with transparency
+		trajectory_line.antialiased = true
+		trajectory_line.joint_mode = Line2D.LINE_JOINT_ROUND
+		trajectory_line.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		trajectory_line.end_cap_mode = Line2D.LINE_CAP_ROUND
 	
 	# Engine - handle array of engines
 	if PlayerData.equipped_components.has("engine"):
@@ -168,15 +181,8 @@ func _process(delta):
 	# Update hit effects
 	_update_hit_effects(delta)
 	
-	# Only draw the line if the target position is different from the current position
-	if global_position.distance_to(target_position) > 5:
-		trajectory_line.points = [
-			Vector2.ZERO,
-			to_local(target_position)
-		]
-		trajectory_line.visible = true
-	else:
-		trajectory_line.visible = false
+	# Update trajectory line with improved visuals
+	_update_trajectory_line()
 		
 	if current_target and is_instance_valid(current_target):
 		fire_timer += delta
@@ -211,6 +217,60 @@ func _process(delta):
 				print("No current target")
 	else:
 		current_target = null
+
+func _update_trajectory_line():
+	if not trajectory_line:
+		return
+		
+	var distance = global_position.distance_to(target_position)
+	
+	if distance > 5:
+		# Show trajectory line with animation
+		trajectory_line.points = [
+			Vector2.ZERO,
+			to_local(target_position)
+		]
+		
+		# Animate the line appearance
+		if not trajectory_line.visible:
+			trajectory_line.visible = true
+			_animate_trajectory_line_in()
+		
+		# Update line color based on target type
+		if current_target:
+			# Red for locked targets
+			trajectory_line.default_color = Color(1, 0.3, 0.3, 0.9)
+		else:
+			# Green for movement targets
+			trajectory_line.default_color = Color(0, 1, 0, 0.8)
+	else:
+		# Hide trajectory line with animation
+		if trajectory_line.visible:
+			_animate_trajectory_line_out()
+
+func _animate_trajectory_line_in():
+	if not trajectory_line:
+		return
+		
+	# Stop any existing animation
+	if trajectory_animation_tween:
+		trajectory_animation_tween.kill()
+	
+	trajectory_animation_tween = create_tween()
+	trajectory_animation_tween.tween_property(trajectory_line, "modulate:a", 0.0, 0.0)
+	trajectory_animation_tween.tween_property(trajectory_line, "modulate:a", 1.0, 0.2).set_ease(Tween.EASE_OUT)
+
+func _animate_trajectory_line_out():
+	if not trajectory_line:
+		return
+		
+	# Stop any existing animation
+	if trajectory_animation_tween:
+		trajectory_animation_tween.kill()
+	
+	trajectory_animation_tween = create_tween()
+	trajectory_animation_tween.tween_property(trajectory_line, "modulate:a", 0.0, 0.2).set_ease(Tween.EASE_IN)
+	trajectory_animation_tween.tween_callback(func(): trajectory_line.visible = false)
 
 func _update_hit_effects(delta):
 	# Update flash effect

@@ -27,5 +27,9 @@ position_smoothing_speed = 0.5
 
 [node name="TrajectoryLine" type="Line2D" parent="."]
 visible = false
-width = 2.0
+width = 3.0
+default_color = Color(0, 1, 0, 0.8)
 antialiased = true
+joint_mode = 1
+begin_cap_mode = 1
+end_cap_mode = 1

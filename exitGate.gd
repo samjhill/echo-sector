@@ -47,8 +47,11 @@ func _on_body_entered(body):
 	if body.is_in_group("players"):
 		print("Gate triggered!")
 		var reward = 25
+		
+		# Save progress only on successful escape
 		PlayerData.credits += reward
 		PlayerData.save_game()
+		print("Progress saved! Credits earned: " + str(reward))
 
 		var win_screen = preload("res://win_screen.tscn").instantiate()
 		win_screen.credits_earned = reward

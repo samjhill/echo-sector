@@ -67,8 +67,8 @@ func grant_kill_reward():
 	var scrap_reward = 3  # base scrap reward
 	PlayerData.credits += reward
 	PlayerData.add_scrap(scrap_reward)
-	PlayerData.save_game()
-	print("Enemy destroyed. +", reward, " credits, +", scrap_reward, " scrap. Total:", PlayerData.credits, " credits,", PlayerData.scrap, " scrap")
+	# Don't save here - only save on successful escape
+	print("Enemy destroyed. +", reward, " credits, +", scrap_reward, " scrap. (Progress will be saved on escape)")
 
 
 func _input_event(viewport, event, shape_idx):

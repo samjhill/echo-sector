@@ -77,14 +77,14 @@ func _on_heal_button_pressed():
 			print("Ship is already fully repaired!")
 			return
 		
-		# Perform healing
+		# Perform healing (don't save yet - only save on escape)
 		PlayerData.scrap -= heal_cost
-		PlayerData.save_game()
+		# PlayerData.save_game() - removed, only save on successful escape
 		
 		# Heal the player
 		if player.has_method("heal"):
 			player.heal(1)  # Heal 1 health point
-			print("Ship repaired! Cost: " + str(heal_cost) + " scrap")
+			print("Ship repaired! Cost: " + str(heal_cost) + " scrap (will be saved on escape)")
 		else:
 			print("Player doesn't have heal method!")
 

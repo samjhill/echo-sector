@@ -1,13 +1,13 @@
 [gd_resource type="Resource" script_class="EngineComponent" load_steps=3 format=3 uid="uid://ckrn2h10dpkcp"]
 
 [ext_resource type="Script" uid="uid://c2tq53tjbh8vv" path="res://components/engine_component.gd" id="1_lq4qh"]
-[ext_resource type="Texture2D" uid="uid://dmwg1k356yda4" path="res://assets/textures/ship.png" id="2_ship"]
+[ext_resource type="Texture2D" uid="uid://afterburner_texture" path="res://assets/textures/afterburner.png" id="2_afterburner"]
 
 [resource]
 script = ExtResource("1_lq4qh")
 name = "Afterburner"
 description = "Short bursts of speed."
 slot_type = "engine"
-icon = ExtResource("2_ship")
+icon = ExtResource("2_afterburner")
 move_speed_bonus = 200.0
 rotation_speed_bonus = 3.0 

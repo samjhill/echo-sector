@@ -13,47 +13,67 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_l2arl")
 
-[node name="TextureRect" type="TextureRect" parent="."]
-layout_mode = 0
-offset_left = -172.0
-offset_top = -119.0
-offset_right = 852.0
-offset_bottom = 1417.0
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 texture = ExtResource("2_wmwda")
+stretch_mode = 6
 
-[node name="ColorRect" type="ColorRect" parent="."]
-layout_mode = 0
-offset_left = -15.0
-offset_top = 724.0
-offset_right = 657.0
-offset_bottom = 1148.0
-color = Color(0.290196, 0.290196, 0.290196, 0.721569)
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-layout_mode = 0
-offset_left = 35.0
-offset_top = 804.0
-offset_right = 590.0
-offset_bottom = 1053.0
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 60.0
+offset_top = 80.0
+offset_right = -60.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VictoryLabel" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-theme_type_variation = &"GraphFrameTitleLabel"
-theme_override_font_sizes/font_size = 45
-text = "Mission Complete!"
-horizontal_alignment = 1
-
-[node name="RewardLabel" type="Label" parent="VBoxContainer"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "You earned 25 credits"
-horizontal_alignment = 1
-
-[node name="ReturnButton" type="Button" parent="VBoxContainer"]
+[node name="Spacer1" type="Control" parent="MainContainer"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_font_sizes/font_size = 30
-text = "Return to hangar"
+
+[node name="VictorySection" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="VictoryLabel" type="Label" parent="MainContainer/VictorySection"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "You successfully escaped the Echo Sector!"
+horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="MainContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ReturnButton" type="Button" parent="MainContainer"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 28
+text = "🚀 RETURN TO HANGAR"
+
+[node name="Spacer3" type="Control" parent="MainContainer"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+size_flags_vertical = 3
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("3_l5t5q")

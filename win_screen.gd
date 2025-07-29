@@ -5,30 +5,79 @@ var enemies_killed: int = 0
 var scrap_earned: int = 0
 
 func _ready():
-	$VBoxContainer/VictoryLabel.text = "Mission Complete!"
-	$VBoxContainer/RewardLabel.text = "You earned " + str(credits_earned) + " credits"
+	# Create statistics labels if they don't exist
+	_create_statistics_labels()
 	
-	# Add run statistics
-	var stats_text = ""
-	stats_text += "Enemies Destroyed: " + str(enemies_killed) + "\n"
-	stats_text += "Credits Earned: " + str(credits_earned) + "\n"
-	stats_text += "Scrap Collected: " + str(scrap_earned)
+	# Update statistics labels
+	_update_statistics_display()
 	
-	# Create a new label for statistics
-	var stats_label = Label.new()
-	stats_label.text = stats_text
-	stats_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	stats_label.add_theme_font_size_override("font_size", 20)
-	stats_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 1))
+	# Connect button
+	$MainContainer/ReturnButton.pressed.connect(_on_return_pressed)
+
+func _create_statistics_labels():
+	var main_container = $MainContainer
 	
-	# Insert the stats label before the return button
-	var vbox = $VBoxContainer
-	var return_button = vbox.get_node("ReturnButton")
-	var button_index = return_button.get_index()
-	vbox.add_child(stats_label)
-	vbox.move_child(stats_label, button_index)
+	# Check if labels already exist
+	var enemies_label = main_container.get_node_or_null("EnemiesKilledLabel")
+	var credits_label = main_container.get_node_or_null("CreditsEarnedLabel")
+	var scrap_label = main_container.get_node_or_null("ScrapCollectedLabel")
 	
-	$VBoxContainer/ReturnButton.pressed.connect(_on_return_pressed)
+	# Get the index where we want to insert the labels (after Spacer2)
+	var spacer2 = main_container.get_node("Spacer2")
+	var insert_index = spacer2.get_index() + 1
+	
+	# Create enemies killed label if it doesn't exist
+	if not enemies_label:
+		enemies_label = Label.new()
+		enemies_label.name = "EnemiesKilledLabel"
+		enemies_label.layout_mode = 2
+		enemies_label.add_theme_font_size_override("font_size", 26)
+		enemies_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		enemies_label.add_theme_color_override("font_color", Color(1, 0.6, 0.6, 1))
+		main_container.add_child(enemies_label)
+		main_container.move_child(enemies_label, insert_index)
+		insert_index += 1
+	
+	# Create credits earned label if it doesn't exist
+	if not credits_label:
+		credits_label = Label.new()
+		credits_label.name = "CreditsEarnedLabel"
+		credits_label.layout_mode = 2
+		credits_label.add_theme_font_size_override("font_size", 26)
+		credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		credits_label.add_theme_color_override("font_color", Color(1, 0.9, 0.3, 1))
+		main_container.add_child(credits_label)
+		main_container.move_child(credits_label, insert_index)
+		insert_index += 1
+	
+	# Create scrap collected label if it doesn't exist
+	if not scrap_label:
+		scrap_label = Label.new()
+		scrap_label.name = "ScrapCollectedLabel"
+		scrap_label.layout_mode = 2
+		scrap_label.add_theme_font_size_override("font_size", 26)
+		scrap_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		scrap_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 1))
+		main_container.add_child(scrap_label)
+		main_container.move_child(scrap_label, insert_index)
+
+func _update_statistics_display():
+	var main_container = $MainContainer
+	
+	# Update enemies killed label
+	var enemies_label = main_container.get_node_or_null("EnemiesKilledLabel")
+	if enemies_label:
+		enemies_label.text = "Enemies Destroyed: " + str(enemies_killed)
+	
+	# Update credits earned label
+	var credits_label = main_container.get_node_or_null("CreditsEarnedLabel")
+	if credits_label:
+		credits_label.text = "Credits Earned: " + str(credits_earned)
+	
+	# Update scrap collected label
+	var scrap_label = main_container.get_node_or_null("ScrapCollectedLabel")
+	if scrap_label:
+		scrap_label.text = "Scrap Collected: " + str(scrap_earned)
 
 func _on_return_pressed():
 	queue_free()

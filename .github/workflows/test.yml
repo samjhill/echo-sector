@@ -1,0 +1,44 @@
+name: Echo Sector Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Godot
+      uses: godotengine/godot-ci-action@v1
+      with:
+        version: 4.2.2
+        platform: linux
+        target: editor
+        cache: true
+        
+    - name: Run Tests
+      run: |
+        echo "🧪 Running Echo Sector Tests..."
+        godot --headless --script res://tests/run_tests.gd
+        
+    - name: Test Results
+      if: always()
+      run: |
+        echo "📊 Test execution completed"
+        echo "Check the logs above for detailed test results"
+        
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          *.log
+          test-results/
+        retention-days: 7 

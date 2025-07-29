@@ -86,6 +86,17 @@ func take_damage(amount: int):
 	
 	if current_health <= 0:
 		die()
+
+func heal(amount: int):
+	current_health = min(current_health + amount, max_health)
+	update_health_ui()
+	print("Player healed! Health: " + str(current_health) + "/" + str(max_health))
+
+func get_current_health() -> int:
+	return current_health
+
+func get_max_health() -> int:
+	return max_health
 		
 func update_health_ui():
 	if health_bar and health_bar.has_method("set_value"):

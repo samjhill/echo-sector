@@ -76,11 +76,17 @@ func populate_equipment_screen():
 func _on_change_button_pressed(slot_type: String, slot_index: int):
 	changing_slot_type = slot_type
 	changing_slot_index = slot_index
-	# Show a simple selection dialog using PopupMenu
+	
+	# Create a better popup with proper styling and positioning
 	var popup = PopupMenu.new()
 	popup.name = "EquipPopup"
+	
+	# Style the popup for better visibility and touch interaction
+	popup.add_theme_font_size_override("font_size", 20)  # Larger font for touch
+	
 	# Add available items of the correct type
 	var item_index = 0
+	var available_items = []
 	print("Inventory size:", PlayerData.inventory.size())
 	for item in PlayerData.inventory:
 		if item == null:
@@ -89,22 +95,31 @@ func _on_change_button_pressed(slot_type: String, slot_index: int):
 		if item.slot_type == slot_type:
 			print("Adding item to popup:", item.name, "of type", item.slot_type)
 			popup.add_item(item.name, item_index)
+			available_items.append(item)
 			item_index += 1
-	popup.connect("id_pressed", Callable(self, "_on_equip_item_selected").bind(popup))
+	
+	# Add a "Cancel" option at the end
+	popup.add_separator()
+	popup.add_item("Cancel", -1)
+	
+	popup.connect("id_pressed", Callable(self, "_on_equip_item_selected").bind(popup, available_items))
 	add_child(popup)
-	# Show the popup at a default position
-	popup.popup()
+	
+	popup.popup_centered()
 
-func _on_equip_item_selected(id: int, popup: PopupMenu):
+func _on_equip_item_selected(id: int, popup: PopupMenu, available_items: Array):
 	var slot_type = changing_slot_type
 	var slot_index = changing_slot_index
-	var items = []
-	for item in PlayerData.inventory:
-		if item.slot_type == slot_type:
-			items.append(item)
-	print("Selected item ID:", id, "from", items.size(), "available items")
-	if id >= 0 and id < items.size():
-		var selected_item = items[id]
+	
+	print("Selected item ID:", id, "from", available_items.size(), "available items")
+	
+	# Handle cancel
+	if id == -1:
+		popup.queue_free()
+		return
+	
+	if id >= 0 and id < available_items.size():
+		var selected_item = available_items[id]
 		if selected_item != null:
 			var equipped = PlayerData.equipped_components[slot_type] if PlayerData.equipped_components.has(slot_type) else []
 			# Ensure the array is large enough
@@ -118,5 +133,6 @@ func _on_equip_item_selected(id: int, popup: PopupMenu):
 		else:
 			print("Error: Selected item is null")
 	else:
-		print("Error: Invalid item ID:", id, "from", items.size(), "available items")
+		print("Error: Invalid item ID:", id, "from", available_items.size(), "available items")
+	
 	popup.queue_free()

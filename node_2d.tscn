@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cshpcj3cn5ss3"]
+[gd_scene load_steps=17 format=3 uid="uid://cshpcj3cn5ss3"]
 
 [ext_resource type="Script" uid="uid://cm24cv2ae8wh5" path="res://main.gd" id="1_epypp"]
 [ext_resource type="PackedScene" uid="uid://c1mhc7besptjh" path="res://enemy.tscn" id="2_epypp"]
@@ -12,8 +12,29 @@
 [ext_resource type="AudioStream" uid="uid://7ukkq5a7jy1x" path="res://music/echo-sector-battle.wav" id="10_ir8iy"]
 [ext_resource type="Script" uid="uid://bm1tpts83n036" path="res://game_ui_manager.gd" id="11_ui_manager"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_rj586"]
-bg_color = Color(0.794921, 0.676217, 0.96922, 1)
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_bar_bg"]
+bg_color = Color(0.1, 0.1, 0.15, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.3, 0.4, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_health_bar_fill"]
+bg_color = Color(0.2, 0.8, 0.2, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.1, 0.6, 0.1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_heal_button_hover"]
 bg_color = Color(1, 0.3, 0.3, 0.95)
@@ -108,24 +129,34 @@ stretch_mode = 1
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="HealthBar" type="ProgressBar" parent="UI"]
-offset_left = 193.0
-offset_top = 1004.0
-offset_right = 473.0
-offset_bottom = 1038.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_colors/font_outline_color = Color(1, 1, 1, 1)
-theme_override_constants/outline_size = 1
-theme_override_styles/fill = SubResource("StyleBoxFlat_rj586")
+offset_left = 20.0
+offset_top = 1000.0
+offset_right = 320.0
+offset_bottom = 1040.0
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 18
+theme_override_styles/background = SubResource("StyleBoxFlat_health_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_health_bar_fill")
 max_value = 5.0
 value = 5.0
+show_percentage = false
 
 [node name="Label" type="Label" parent="UI/HealthBar"]
-layout_mode = 0
-offset_left = 14.0
-offset_right = 92.0
-offset_bottom = 34.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 16
+text = "5 / 5"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="ResourcesPanel" type="Panel" parent="UI"]
 offset_left = 20.0

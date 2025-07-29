@@ -14,95 +14,264 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mh0ax")
 
-[node name="Panel" type="Panel" parent="."]
-layout_mode = 0
-offset_left = 21.0
-offset_top = 329.0
-offset_right = 629.0
-offset_bottom = 638.0
-
-[node name="Label" type="Label" parent="Panel"]
-layout_mode = 0
-offset_left = 22.0
-offset_right = 319.0
-offset_bottom = 45.0
-theme_override_font_sizes/font_size = 30
-text = "Ship Equipment"
-
-[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
-offset_left = 16.0
-offset_top = 81.0
-offset_right = 584.0
-offset_bottom = 412.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0.1, 0.15, 0.95)
 
-[node name="WeaponSlots" type="VBoxContainer" parent="Panel/VBoxContainer"]
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Header" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Title" type="Label" parent="MainContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 36
+text = "Ship Equipment"
+horizontal_alignment = 1
+
+[node name="CloseButton" type="Button" parent="MainContainer/Header"]
+custom_minimum_size = Vector2(80, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "✕"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="EquipmentContainer" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WeaponSection" type="VBoxContainer" parent="MainContainer/EquipmentContainer"]
 layout_mode = 2
 
-[node name="Slot1" type="HBoxContainer" parent="Panel/VBoxContainer/WeaponSlots"]
+[node name="WeaponTitle" type="Label" parent="MainContainer/EquipmentContainer/WeaponSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
+theme_override_font_sizes/font_size = 24
+text = "WEAPONS"
+horizontal_alignment = 1
+
+[node name="WeaponSlots" type="VBoxContainer" parent="MainContainer/EquipmentContainer/WeaponSection"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="Slot1" type="Panel" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/WeaponSlots/Slot1"]
+[node name="Slot1Container" type="HBoxContainer" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot1/Slot1Container"]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 texture = ExtResource("2_sbil3")
 expand_mode = 2
+stretch_mode = 5
 
-[node name="Label" type="Label" parent="Panel/VBoxContainer/WeaponSlots/Slot1"]
+[node name="Slot1Info" type="VBoxContainer" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot1/Slot1Container"]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot1/Slot1Container/Slot1Info"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
 text = "Weapon Slot 1"
+vertical_alignment = 1
 
-[node name="Button" type="Button" parent="Panel/VBoxContainer/WeaponSlots/Slot1"]
+[node name="Slot1Description" type="Label" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot1/Slot1Container/Slot1Info"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Empty Slot"
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot1/Slot1Container"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
 text = "Change"
 
-[node name="Slot2" type="HBoxContainer" parent="Panel/VBoxContainer/WeaponSlots"]
+[node name="Slot2" type="Panel" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/WeaponSlots/Slot2"]
+[node name="Slot2Container" type="HBoxContainer" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot2/Slot2Container"]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 texture = ExtResource("3_2pvc6")
 expand_mode = 2
+stretch_mode = 5
 
-[node name="Label" type="Label" parent="Panel/VBoxContainer/WeaponSlots/Slot2"]
+[node name="Slot2Info" type="VBoxContainer" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot2/Slot2Container"]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot2/Slot2Container/Slot2Info"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
 text = "Weapon Slot 2"
+vertical_alignment = 1
 
-[node name="Button" type="Button" parent="Panel/VBoxContainer/WeaponSlots/Slot2"]
+[node name="Slot2Description" type="Label" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot2/Slot2Container/Slot2Info"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Empty Slot"
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="MainContainer/EquipmentContainer/WeaponSection/WeaponSlots/Slot2/Slot2Container"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
 text = "Change"
 
-[node name="EngineSlot" type="HBoxContainer" parent="Panel/VBoxContainer"]
+[node name="HSeparator2" type="HSeparator" parent="MainContainer/EquipmentContainer"]
+layout_mode = 2
+theme_override_constants/separation = 30
+
+[node name="EngineSection" type="VBoxContainer" parent="MainContainer/EquipmentContainer"]
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/EngineSlot"]
+[node name="EngineTitle" type="Label" parent="MainContainer/EquipmentContainer/EngineSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 24
+text = "ENGINES"
+horizontal_alignment = 1
+
+[node name="EngineSlots" type="VBoxContainer" parent="MainContainer/EquipmentContainer/EngineSection"]
+layout_mode = 2
+theme_override_constants/separation = 15
+
+[node name="EngineSlot" type="Panel" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+
+[node name="EngineSlotContainer" type="HBoxContainer" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot/EngineSlotContainer"]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 texture = ExtResource("4_61cns")
 expand_mode = 2
+stretch_mode = 5
 
-[node name="Label" type="Label" parent="Panel/VBoxContainer/EngineSlot"]
+[node name="EngineSlotInfo" type="VBoxContainer" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot/EngineSlotContainer"]
 layout_mode = 2
-text = "Engine Slot"
+size_flags_horizontal = 3
 
-[node name="Button" type="Button" parent="Panel/VBoxContainer/EngineSlot"]
+[node name="Label" type="Label" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot/EngineSlotContainer/EngineSlotInfo"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Engine Slot 1"
+vertical_alignment = 1
+
+[node name="EngineSlotDescription" type="Label" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot/EngineSlotContainer/EngineSlotInfo"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Empty Slot"
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot/EngineSlotContainer"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
 text = "Change"
 
-[node name="EngineSlot2" type="HBoxContainer" parent="Panel/VBoxContainer"]
+[node name="EngineSlot2" type="Panel" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 
-[node name="TextureRect" type="TextureRect" parent="Panel/VBoxContainer/EngineSlot2"]
+[node name="EngineSlot2Container" type="HBoxContainer" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = -15.0
+offset_bottom = -15.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect" type="TextureRect" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot2/EngineSlot2Container"]
+custom_minimum_size = Vector2(80, 80)
 layout_mode = 2
 texture = ExtResource("4_61cns")
 expand_mode = 2
+stretch_mode = 5
 
-[node name="Label" type="Label" parent="Panel/VBoxContainer/EngineSlot2"]
+[node name="EngineSlot2Info" type="VBoxContainer" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot2/EngineSlot2Container"]
 layout_mode = 2
-text = "Engine Slot"
+size_flags_horizontal = 3
 
-[node name="Button" type="Button" parent="Panel/VBoxContainer/EngineSlot2"]
+[node name="Label" type="Label" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot2/EngineSlot2Container/EngineSlot2Info"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Engine Slot 2"
+vertical_alignment = 1
+
+[node name="EngineSlot2Description" type="Label" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot2/EngineSlot2Container/EngineSlot2Info"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Empty Slot"
+vertical_alignment = 1
+
+[node name="Button" type="Button" parent="MainContainer/EquipmentContainer/EngineSection/EngineSlots/EngineSlot2/EngineSlot2Container"]
+custom_minimum_size = Vector2(120, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
 text = "Change"
-
-[node name="Button" type="Button" parent="Panel/VBoxContainer"]
-layout_mode = 2
-text = "Close"

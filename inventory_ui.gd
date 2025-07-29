@@ -25,7 +25,7 @@ func update_inventory():
 	tooltip_panel.visible = false
 
 
-func _on_item_button_pressed(item):
+func _on_item_button_pressed(item: Item):
 	tooltip_label.text = "%s\n\n%s" % [item.name, item.description]
 	tooltip_panel.visible = true
 

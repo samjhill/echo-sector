@@ -1,5 +1,5 @@
 class_name LaserWeapon
-extends ShipComponent
+extends Item
 
 
 @export var damage: int = 10

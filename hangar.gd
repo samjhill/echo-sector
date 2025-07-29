@@ -8,6 +8,7 @@ func _ready():
 	PlayerData.load_game()
 	$VBoxContainer/BuildLabel.text = "Build: " + BuildVersion.BUILD_VERSION + " - " + BuildVersion.BUILD_TIMESTAMP
 	$VBoxContainer/CreditsLabel.text = "Credits: " + str(PlayerData.credits)
+	$VBoxContainer/ScrapLabel.text = "Scrap: " + str(PlayerData.scrap)
 
 	$VBoxContainer/LaunchButton.pressed.connect(_on_launch_pressed)
 	
@@ -16,6 +17,15 @@ func _ready():
 	load_equipment_from_player_data()
 
 func _on_launch_pressed():
+	# Check if player has a weapon and engine equipped
+	var equipped = PlayerData.equipped_components
+	var has_weapon = equipped.has("weapon")
+	var has_engine = equipped.has("engine")
+	if not has_weapon or not has_engine:
+		print("Player missing equipment! Routing to equipment screen.")
+		ship_loadout_panel.visible = true
+		logo.visible = false
+		return
 	# Replace with your actual Abyss run scene path
 	get_tree().change_scene_to_file("res://node_2d.tscn")
 
@@ -28,26 +38,29 @@ func load_equipment_from_player_data():
 	var equipped_components = PlayerData.equipped_components
 	for slot_name in equipped_components:
 		print("loading ", slot_name)
-		var component = equipped_components[slot_name]
-		print("component for slot: ", component)
-		update_slot_ui(slot_name, component)
+		var components = equipped_components[slot_name]  # This is now an array
+		print("components for slot: ", components)
+		update_slot_ui(slot_name, components)
 
-func update_slot_ui(slot_name: String, component: Dictionary):
-	# Update UI elements (e.g., icon, name)
-	var slot_node
-	var node_name
+func update_slot_ui(slot_name: String, components: Array):
+	# Update UI elements for multiple components per slot
 	if slot_name == "weapon":
-		node_name = "ShipEquipmentScreen/Panel/VBoxContainer/WeaponSlots/"
-		slot_node = get_node(node_name + "Slot1")
+		for i in range(components.size()):
+			var component = components[i]
+			var slot_node = get_node("ShipEquipmentScreen/Panel/VBoxContainer/WeaponSlots/Slot" + str(i + 1))
+			if slot_node and component != null:
+				slot_node.get_node("Label").text = component.name
+				if component.icon:
+					slot_node.get_node("TextureRect").texture = component.icon
 	
 	if slot_name == "engine":
-		node_name = "ShipEquipmentScreen/Panel/VBoxContainer/EngineSlot"
-		slot_node = get_node(node_name)
-	
-	#slot_node.get_node("Icon").texture = load(component.icon_path)
-	print("slot_name:", node_name)
-	print("slot_node: ", slot_node)
-	slot_node.get_node("Label").text = component.name
+		for i in range(components.size()):
+			var component = components[i]
+			var slot_node = get_node("ShipEquipmentScreen/Panel/VBoxContainer/EngineSlot" + str(i + 1))
+			if slot_node and component != null:
+				slot_node.get_node("Label").text = component.name
+				if component.icon:
+					slot_node.get_node("TextureRect").texture = component.icon
 
 func save_equipment_to_player_data():
 	var equipped = {}

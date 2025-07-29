@@ -8,13 +8,13 @@ extends CharacterBody2D
 @export var orbit_radius := 180.0
 @export var orbit_speed := 1.0  # radians per second
 @export var max_health := 5
-@export var engine_component: EngineComponent
-@export var weapon_components: Array[ShipComponent]
+@export var engine_component: Item
+@export var weapon_components: Array[Item]
 
 
 @onready var trajectory_line = $TrajectoryLine
 @onready var camera = $Camera2D
-@onready var health_bar = get_tree().root.get_node("Game/UI/HealthBar")
+@onready var health_bar = get_tree().root.get_node("Game/UI/HealthBar") if get_tree().root.has_node("Game/UI/HealthBar") else null
 
 var weapon_cooldowns := []
 var current_health := max_health
@@ -32,23 +32,27 @@ func _ready():
 	target_position = global_position
 	update_health_ui()
 	
-	# Engine
-	#match player_data.equipped_engine:
-		#"basic_engine":
-			#engine_component = EngineComponent.new()
-		#_:
-			#engine_component = null
+	# Engine - handle array of engines
+	if PlayerData.equipped_components.has("engine"):
+		var engines = PlayerData.equipped_components["engine"]
+		if engines.size() > 0 and engines[0] != null:
+			engine_component = engines[0]  # Use first engine for now
+		else:
+			engine_component = null
+	else:
+		engine_component = null
 
-	# Weapons
+	# Weapons - handle array of weapons
 	weapon_components.clear()
-	for weapon in PlayerData.get_equipped_weapons():
-		var weapon_name = weapon["name"]
-		match weapon_name:
-			"Pulse Laser Mk I":
-				weapon_components.append(LaserWeapon.new())
-			_:  # Unknown or unassigned
-				print("Unknown weapon:", weapon_name)
-
+	var equipped_weapons = PlayerData.get_equipped_weapons()
+	print("Equipped weapons at start:", equipped_weapons.size())
+	for weapon in equipped_weapons:
+		if weapon != null:
+			weapon_components.append(weapon)
+			print("Added weapon:", weapon.name)
+	
+	print("Total weapon components:", weapon_components.size())
+	
 	# Set up cooldowns for equipped weapons
 	weapon_cooldowns.resize(weapon_components.size())
 	for i in weapon_cooldowns.size():
@@ -71,7 +75,10 @@ func update_health_ui():
 	if health_bar and health_bar.has_method("set_value"):
 		health_bar.set_value(current_health)
 		var label = health_bar.get_node("Label")
-		label.text = "%d / %d" % [current_health, max_health]
+		if label:
+			label.text = "%d / %d" % [current_health, max_health]
+	else:
+		print("Warning: Health bar not found or invalid")
 
 func die():
 	print("Player has died. Game Over.")
@@ -148,17 +155,35 @@ func _process(delta):
 			#shoot_at_target(current_target)
 		
 		
-		for i in weapon_components.size():
+		for i in range(weapon_components.size()):
 			var weapon = weapon_components[i]
-			if weapon is LaserWeapon and current_target:
-				weapon_cooldowns[i] += delta
-				if weapon_cooldowns[i] >= weapon.cooldown:
-					weapon_cooldowns[i] = 0.0
-					shoot_laser(weapon, current_target)
+			if weapon != null and current_target:
+				print("Processing weapon", i, ":", weapon.name, "type:", typeof(weapon), "class:", weapon.get_class())
+				if weapon is LaserWeapon:
+					print("Weapon is LaserWeapon, checking cooldown... Current cooldown:", weapon_cooldowns[i], "Required:", weapon.cooldown)
+					weapon_cooldowns[i] += delta
+					if weapon_cooldowns[i] >= weapon.cooldown:
+						weapon_cooldowns[i] = 0.0
+						print("Firing laser at target:", current_target)
+						shoot_laser(weapon, current_target)
+				elif weapon is RailgunWeapon:
+					print("Weapon is RailgunWeapon, checking cooldown... Current cooldown:", weapon_cooldowns[i], "Required:", weapon.cooldown)
+					weapon_cooldowns[i] += delta
+					if weapon_cooldowns[i] >= weapon.cooldown:
+						weapon_cooldowns[i] = 0.0
+						print("Firing railgun at target:", current_target)
+						shoot_railgun(weapon, current_target)
+				else:
+					print("Weapon is not recognized type:", typeof(weapon), "class:", weapon.get_class())
+			elif weapon == null:
+				print("Weapon", i, "is null")
+			elif current_target == null:
+				print("No current target")
 	else:
 		current_target = null
 
 func shoot_laser(weapon: LaserWeapon, target: Node2D):
+	print("shoot_laser called with weapon:", weapon.name, "target:", target.name)
 	var laser = preload("res://laser_projectile.tscn").instantiate()
 	
 	var direction = (target.global_position - global_position).normalized()
@@ -167,7 +192,9 @@ func shoot_laser(weapon: LaserWeapon, target: Node2D):
 	laser.rotation = direction.angle()
 	
 	laser.damage = weapon.damage
+	print("Created laser with damage:", weapon.damage, "direction:", direction)
 	get_tree().current_scene.add_child(laser)
+	print("Added laser to scene")
 
 
 func shoot_at_target(target: Node2D):
@@ -195,8 +222,24 @@ func lock_on_target(target: Node2D):
 		orbiting = false
 	else:
 		current_target = target
+		print("New current_target set:", current_target)
 		fire_timer = 0.0  # Reset cooldown
 		if current_target.has_method("set_locked"):
 			current_target.set_locked(true)
 			print("locked onto:", target.name)
 		_set_target(target.global_position)
+
+func shoot_railgun(weapon: RailgunWeapon, target: Node2D):
+	print("shoot_railgun called with weapon:", weapon.name, "target:", target.name)
+	var projectile = preload("res://projectile.tscn").instantiate()
+	
+	var direction = (target.global_position - global_position).normalized()
+	projectile.global_position = global_position
+	projectile.direction = direction
+	projectile.rotation = direction.angle()
+	
+	projectile.damage = weapon.damage
+	projectile.speed = weapon.projectile_speed
+	print("Created railgun projectile with damage:", weapon.damage, "speed:", weapon.projectile_speed, "direction:", direction)
+	get_tree().current_scene.add_child(projectile)
+	print("Added railgun projectile to scene")

@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+signal enemy_killed
+
 @export var speed: float = 100.0
 @export var max_health: int = 3
 @export var color: Color = Color.RED
@@ -53,6 +55,7 @@ func take_damage(amount: int):
 	if health <= 0:
 		_spawn_explosion_effect()
 		grant_kill_reward()
+		enemy_killed.emit()  # Emit signal when killed
 		queue_free()
 
 func _spawn_explosion_effect():

@@ -1,6 +1,11 @@
 extends Node2D
 @export var enemy_scene: PackedScene
 
+# Run statistics
+var enemies_killed := 0
+var credits_earned_this_run := 0
+var scrap_earned_this_run := 0
+
 func _ready():
 	spawn_enemy_timer()
 
@@ -38,4 +43,21 @@ func _on_spawn_enemy():
 		randf_range(0, screen_size.x),
 		randf_range(0, screen_size.y)
 	)
+	
+	# Connect to this enemy's death signal
+	enemy.enemy_killed.connect(_on_enemy_killed)
+	
 	add_child(enemy)
+
+func _on_enemy_killed():
+	enemies_killed += 1
+	credits_earned_this_run += 5  # Base credit reward per enemy
+	scrap_earned_this_run += 3    # Base scrap reward per enemy
+	print("Run stats - Enemies killed:", enemies_killed, " Credits:", credits_earned_this_run, " Scrap:", scrap_earned_this_run)
+
+func get_run_statistics() -> Dictionary:
+	return {
+		"enemies_killed": enemies_killed,
+		"credits_earned": credits_earned_this_run,
+		"scrap_earned": scrap_earned_this_run
+	}

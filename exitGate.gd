@@ -55,6 +55,13 @@ func _on_body_entered(body):
 
 		var win_screen = preload("res://win_screen.tscn").instantiate()
 		win_screen.credits_earned = reward
+		
+		# Get run statistics from the main game
+		var game_node = get_tree().current_scene
+		if game_node and game_node.has_method("get_run_statistics"):
+			var stats = game_node.get_run_statistics()
+			win_screen.enemies_killed = stats.get("enemies_killed", 0)
+			win_screen.scrap_earned = stats.get("scrap_earned", 0)
 
 		get_tree().root.add_child(win_screen)
 		get_tree().current_scene.queue_free()

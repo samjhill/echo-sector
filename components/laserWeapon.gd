@@ -4,3 +4,6 @@ extends Item
 
 @export var damage: int = 10
 @export var cooldown: float = 2.5
+
+func _init():
+	icon = preload("res://assets/textures/uranium.png")

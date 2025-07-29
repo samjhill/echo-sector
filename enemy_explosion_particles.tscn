@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://bq8x70a00a1b2"]
+
+[ext_resource type="Script" path="res://enemy_explosion_particles.gd" id="1_particles"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_1"]
+emission_shape = 1
+emission_sphere_radius = 20.0
+particle_flag_disable_z = true
+direction = Vector3(0, 1, 0)
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 50.0
+initial_velocity_max = 150.0
+scale_min = 2.0
+scale_max = 4.0
+color_ramp = null
+
+[node name="EnemyExplosionParticles" type="GPUParticles2D"]
+emitting = false
+amount = 40
+lifetime = 2.0
+one_shot = true
+explosiveness = 0.8
+process_material = SubResource("ParticleProcessMaterial_1")
+script = ExtResource("1_particles") 

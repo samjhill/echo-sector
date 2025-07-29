@@ -14,6 +14,7 @@ extends CharacterBody2D
 
 @onready var trajectory_line = $TrajectoryLine
 @onready var camera = $Camera2D
+@onready var sprite = $Sprite2D
 @onready var health_bar = get_tree().root.get_node("Game/UI/HealthBar") if get_tree().root.has_node("Game/UI/HealthBar") else null
 
 var weapon_cooldowns := []
@@ -25,12 +26,23 @@ var orbit_angle := 0.0
 var current_target: Node2D = null
 var fire_timer: float = 0.0
 
+# Hit effect variables
+var is_flashing := false
+var original_sprite_modulate: Color
+var shake_timer := 0.0
+var shake_intensity := 5.0
+var original_camera_position: Vector2
+
 func _ready():
 	set_process_input(true)
 	add_to_group("players")
 	current_health = max_health
 	target_position = global_position
 	update_health_ui()
+	
+	# Store original sprite and camera properties for hit effects
+	original_sprite_modulate = sprite.modulate
+	original_camera_position = camera.position
 	
 	# Engine - handle array of engines
 	if PlayerData.equipped_components.has("engine"):
@@ -68,6 +80,10 @@ func _input(event):
 func take_damage(amount: int):
 	current_health -= amount
 	update_health_ui()
+	
+	# Trigger hit effects
+	_trigger_hit_effects()
+	
 	if current_health <= 0:
 		die()
 		
@@ -138,6 +154,9 @@ func _physics_process(delta):
 	move_and_slide()
 
 func _process(delta):
+	# Update hit effects
+	_update_hit_effects(delta)
+	
 	# Only draw the line if the target position is different from the current position
 	if global_position.distance_to(target_position) > 5:
 		trajectory_line.points = [
@@ -181,6 +200,38 @@ func _process(delta):
 				print("No current target")
 	else:
 		current_target = null
+
+func _update_hit_effects(delta):
+	# Update flash effect
+	if is_flashing:
+		var flash_progress = (Time.get_time_dict_from_system()["second"] * 20) % 2
+		if flash_progress < 1:
+			sprite.modulate = Color.RED
+		else:
+			sprite.modulate = Color.WHITE
+	
+	# Update camera shake
+	if shake_timer > 0:
+		shake_timer -= delta
+		if shake_timer <= 0:
+			camera.position = original_camera_position
+		else:
+			var shake_offset = Vector2(
+				randf_range(-shake_intensity, shake_intensity),
+				randf_range(-shake_intensity, shake_intensity)
+			)
+			camera.position = original_camera_position + shake_offset
+
+func _trigger_hit_effects():
+	# Flash effect
+	is_flashing = true
+	await get_tree().create_timer(0.3).timeout
+	is_flashing = false
+	sprite.modulate = original_sprite_modulate
+	
+	# Camera shake
+	shake_timer = 0.2
+	shake_intensity = 3.0
 
 func shoot_laser(weapon: LaserWeapon, target: Node2D):
 	print("shoot_laser called with weapon:", weapon.name, "target:", target.name)

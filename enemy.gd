@@ -51,8 +51,16 @@ func take_damage(amount: int):
 		get_tree().current_scene.add_child(dmg_number)
 
 	if health <= 0:
+		_spawn_explosion_effect()
 		grant_kill_reward()
 		queue_free()
+
+func _spawn_explosion_effect():
+	# Spawn particle effect at enemy position
+	var explosion_scene = preload("res://enemy_explosion_particles.tscn")
+	var explosion = explosion_scene.instantiate()
+	explosion.global_position = global_position
+	get_tree().current_scene.add_child(explosion)
 
 func grant_kill_reward():
 	var reward = 5  # or scale by difficulty later

@@ -26,4 +26,19 @@ func _on_ship_loadout_button_pressed():
 	ship_loadout_panel.populate_equipment_screen()
 
 func _on_launch_button_pressed():
+	# Check if player has proper equipment
+	var equipped_weapons = PlayerData.get_equipped_weapons()
+	var equipped_engines = PlayerData.equipped_components.get("engine", [])
+	
+	# Check if player has at least one weapon and one engine
+	var has_weapon = equipped_weapons.size() > 0 and equipped_weapons[0] != null
+	var has_engine = equipped_engines.size() > 0 and equipped_engines[0] != null
+	
+	if not has_weapon or not has_engine:
+		# Route to equipment screen if missing equipment
+		ship_loadout_panel.visible = true
+		ship_loadout_panel.populate_equipment_screen()
+		return
+	
+	# If properly equipped, launch the game
 	get_tree().change_scene_to_file("res://node_2d.tscn")

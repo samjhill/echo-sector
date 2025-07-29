@@ -59,22 +59,22 @@ alignment = 2
 
 [node name="BuildLabel" type="Label" parent="MainContainer/TopSection/TopRight"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
 text = "Build: 3f6a7b1"
 horizontal_alignment = 2
 
 [node name="CreditsLabel" type="Label" parent="MainContainer/TopSection/TopRight"]
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.8, 0.2, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 0.9, 0.3, 1)
+theme_override_font_sizes/font_size = 22
 text = "Credits: 0"
 horizontal_alignment = 2
 
 [node name="ScrapLabel" type="Label" parent="MainContainer/TopSection/TopRight"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 22
 text = "Scrap: 0"
 horizontal_alignment = 2
 
@@ -82,58 +82,58 @@ horizontal_alignment = 2
 layout_mode = 2
 theme_override_constants/separation = 40
 
-[node name="CenterSection" type="VBoxContainer" parent="MainContainer"]
+[node name="ComingSoonSection" type="VBoxContainer" parent="MainContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 30
+theme_override_constants/separation = 20
 
-[node name="LaunchButton" type="Button" parent="MainContainer/CenterSection"]
-custom_minimum_size = Vector2(0, 100)
+[node name="DronePanel" type="PanelContainer" parent="MainContainer/ComingSoonSection"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
-theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 28
-text = "🚀 LAUNCH MISSION"
 
-[node name="ShipLoadoutButton" type="Button" parent="MainContainer/CenterSection"]
-custom_minimum_size = Vector2(0, 100)
+[node name="Label" type="Label" parent="MainContainer/ComingSoonSection/DronePanel"]
 layout_mode = 2
-theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 28
-text = "⚙️ SHIP LOADOUT"
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 22
+text = "🤖 Drone Bay (Coming Soon)"
+horizontal_alignment = 1
+
+[node name="UpgradePanel" type="PanelContainer" parent="MainContainer/ComingSoonSection"]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="MainContainer/ComingSoonSection/UpgradePanel"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 22
+text = "🔧 Upgrades (Coming Soon)"
+horizontal_alignment = 1
 
 [node name="HSeparator2" type="HSeparator" parent="MainContainer"]
 layout_mode = 2
 theme_override_constants/separation = 40
 
-[node name="BottomSection" type="VBoxContainer" parent="MainContainer"]
+[node name="ActionSection" type="VBoxContainer" parent="MainContainer"]
 layout_mode = 2
-theme_override_constants/separation = 20
+theme_override_constants/separation = 30
 
-[node name="DronePanel" type="PanelContainer" parent="MainContainer/BottomSection"]
-custom_minimum_size = Vector2(0, 80)
+[node name="LaunchButton" type="Button" parent="MainContainer/ActionSection"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "🚀 LAUNCH MISSION"
 
-[node name="Label" type="Label" parent="MainContainer/BottomSection/DronePanel"]
+[node name="ShipLoadoutButton" type="Button" parent="MainContainer/ActionSection"]
+custom_minimum_size = Vector2(0, 100)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 20
-text = "🤖 Drone Bay (Coming Soon)"
-horizontal_alignment = 1
-
-[node name="UpgradePanel" type="PanelContainer" parent="MainContainer/BottomSection"]
-custom_minimum_size = Vector2(0, 80)
-layout_mode = 2
-
-[node name="Label" type="Label" parent="MainContainer/BottomSection/UpgradePanel"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
-theme_override_font_sizes/font_size = 20
-text = "🔧 Upgrades (Coming Soon)"
-horizontal_alignment = 1
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "⚙️ SHIP LOADOUT"
 
 [node name="ShipEquipmentScreen" parent="." instance=ExtResource("6_g2g6c")]
 visible = false

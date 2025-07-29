@@ -1,6 +1,6 @@
 extends Control
 
-@onready var ship_loadout_button = $MainContainer/CenterSection/ShipLoadoutButton
+@onready var ship_loadout_button = $MainContainer/ActionSection/ShipLoadoutButton
 @onready var ship_loadout_panel = $ShipEquipmentScreen
 @onready var logo = $MainContainer/TopSection/Logo
 @onready var credits_label = $MainContainer/TopSection/TopRight/CreditsLabel
@@ -18,7 +18,7 @@ func _ready():
 	ship_loadout_button.pressed.connect(_on_ship_loadout_button_pressed)
 	
 	# Connect launch button
-	var launch_button = $MainContainer/CenterSection/LaunchButton
+	var launch_button = $MainContainer/ActionSection/LaunchButton
 	launch_button.pressed.connect(_on_launch_button_pressed)
 
 func _on_ship_loadout_button_pressed():

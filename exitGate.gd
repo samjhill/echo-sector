@@ -1,6 +1,9 @@
 extends Area2D
 
 var armed := false
+var spin_speed := 1.0  # radians per second
+var glow_timer := 0.0
+var glow_duration := 2.0
 
 func _ready():
 	print("Gate _ready() at:", global_position)
@@ -13,6 +16,27 @@ func _ready():
 	connect("body_entered", Callable(self, "_on_body_entered"))
 	armed = true
 	print("Gate armed!")
+	
+	# Start visual effects
+	_start_visual_effects()
+
+func _process(delta):
+	# Update spinning effect
+	if $PortalSprite:
+		$PortalSprite.rotation += spin_speed * delta
+	
+	# Update glowing effect
+	if $GlowSprite:
+		glow_timer += delta
+		var glow_progress = (glow_timer / glow_duration) * 2 * PI
+		var alpha = 0.5 + 0.3 * sin(glow_progress)
+		$GlowSprite.modulate = Color(1, 1, 1, alpha)
+
+func _start_visual_effects():
+	# Start particle effects
+	var particles = $Particles
+	if particles:
+		particles.emitting = true
 
 func _on_body_entered(body):
 	print("Gate body entered:", body.name)

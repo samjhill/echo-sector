@@ -53,7 +53,7 @@ func _on_body_entered(body):
 		PlayerData.save_game()
 		print("Progress saved! Credits earned: " + str(reward))
 
-		var win_screen = preload("res://win_screen.tscn").instantiate()
+		var win_screen = preload("res://scenes/ui/win_screen.tscn").instantiate()
 		win_screen.credits_earned = reward
 		
 		# Get run statistics from the main game

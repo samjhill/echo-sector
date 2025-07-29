@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://3cskooh7553h"]
 
-[ext_resource type="Script" uid="uid://ccpix3uwvvod4" path="res://exitGate.gd" id="1_qadmq"]
-[ext_resource type="Texture2D" uid="uid://cxvlsyvf0locr" path="res://portal.png" id="2_yxllx"]
+[ext_resource type="Script" uid="uid://ccpix3uwvvod4" path="res://scripts/core/exitGate.gd" id="1_qadmq"]
+[ext_resource type="Texture2D" uid="uid://cxvlsyvf0locr" path="res://assets/textures/portal.png" id="2_yxllx"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_yxllx"]
 radius = 167.863

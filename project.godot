@@ -17,9 +17,9 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-PlayerData="*res://playerData.gd"
-BuildVersion="*res://build_version.gd"
-PlayerInventory="*res://inventory.gd"
+PlayerData="*res://autoload/playerData.gd"
+BuildVersion="*res://autoload/build_version.gd"
+PlayerInventory="*res://autoload/inventory.gd"
 
 [display]
 

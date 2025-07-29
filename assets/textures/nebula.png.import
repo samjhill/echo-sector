@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://xgmptlcb28gi"
-path="res://.godot/imported/nebula.png-d431142329b6448b198341c21140fab8.ctex"
+path="res://.godot/imported/nebula.png-edeaf8215eee8185ff99adc9e6234f63.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://nebula.png"
-dest_files=["res://.godot/imported/nebula.png-d431142329b6448b198341c21140fab8.ctex"]
+source_file="res://assets/textures/nebula.png"
+dest_files=["res://.godot/imported/nebula.png-edeaf8215eee8185ff99adc9e6234f63.ctex"]
 
 [params]
 

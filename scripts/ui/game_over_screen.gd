@@ -12,11 +12,11 @@ func _on_return_pressed():
 
 	
 func change_to_hangar():
-	print("hangar scene exists?", ResourceLoader.exists("res://hangar.tscn"))
+	print("hangar scene exists?", ResourceLoader.exists("res://scenes/menus/hangar.tscn"))
 	print("Before switch:", get_tree().current_scene)
 
 	get_tree().paused = false  # just in case it’s paused
-	var error = get_tree().change_scene_to_file("res://hangar.tscn")
+	var error = get_tree().change_scene_to_file("res://scenes/menus/hangar.tscn")
 
 	if error == OK:
 		print("Scene changed to hangar.")

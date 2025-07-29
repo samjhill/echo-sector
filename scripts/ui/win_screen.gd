@@ -81,4 +81,4 @@ func _update_statistics_display():
 
 func _on_return_pressed():
 	queue_free()
-	get_tree().change_scene_to_file("res://hangar.tscn")
+	get_tree().change_scene_to_file("res://scenes/menus/hangar.tscn")

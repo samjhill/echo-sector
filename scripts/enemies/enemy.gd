@@ -60,7 +60,7 @@ func take_damage(amount: int):
 
 func _spawn_explosion_effect():
 	# Spawn particle effect at enemy position
-	var explosion_scene = preload("res://enemy_explosion_particles.tscn")
+	var explosion_scene = preload("res://scenes/game/enemy_explosion_particles.tscn")
 	var explosion = explosion_scene.instantiate()
 	explosion.global_position = global_position
 	get_tree().current_scene.add_child(explosion)

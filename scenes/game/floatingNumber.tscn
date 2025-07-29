@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://kdaqhg2xsgop"]
 
-[ext_resource type="Script" uid="uid://bjeaw8ww8337" path="res://floating_number.gd" id="1_dcn3b"]
+[ext_resource type="Script" uid="uid://bjeaw8ww8337" path="res://scripts/ui/floating_number.gd" id="1_dcn3b"]
 
 [node name="Label" type="Label"]
 offset_right = 40.0

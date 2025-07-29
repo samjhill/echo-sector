@@ -41,4 +41,4 @@ func _on_launch_button_pressed():
 		return
 	
 	# If properly equipped, launch the game
-	get_tree().change_scene_to_file("res://node_2d.tscn")
+	get_tree().change_scene_to_file("res://scenes/game/node_2d.tscn")

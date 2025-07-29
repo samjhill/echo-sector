@@ -21,7 +21,7 @@ func save_game():
 				"icon_path": item.icon_path,
 				"slot_type": item.slot_type,
 				"stats": item.stats,
-				"resource_path": "res://item.gd"  # Default resource path
+				"resource_path": "res://scripts/core/item.gd"  # Default resource path
 			})
 		else:
 			print("Warning: Found null item in inventory during save")
@@ -38,7 +38,7 @@ func save_game():
 						"icon_path": item.icon_path,
 						"slot_type": item.slot_type,
 						"stats": item.stats,
-						"resource_path": "res://item.gd"  # Default resource path
+						"resource_path": "res://scripts/core/item.gd"  # Default resource path
 					})
 				else:
 					print("Warning: Found null item in equipped_components[", slot, "] during save")
@@ -51,7 +51,7 @@ func save_game():
 					"icon_path": items.icon_path,
 					"slot_type": items.slot_type,
 					"stats": items.stats,
-					"resource_path": "res://item.gd"  # Default resource path
+					"resource_path": "res://scripts/core/item.gd"  # Default resource path
 				}]
 			else:
 				print("Warning: Found null item in equipped_components[", slot, "] during save")
@@ -88,27 +88,27 @@ func load_game():
 				"description": "Basic kinetic weapon.",
 				"slot_type": "weapon",
 				"icon_path": "res://items/plasma-core.png",
-				"resource_path": "res://item.gd"
+				"resource_path": "res://scripts/core/item.gd"
 			},
 			{
 				"name": "Basic Thruster",
 				"description": "Reliable but slow thruster to get you around.",
 				"slot_type": "engine",
 				"icon_path": "res://items/basic_thruster.png",
-				"resource_path": "res://item.gd"
+				"resource_path": "res://scripts/core/item.gd"
 			},
 			{
 				"name": "Afterburner",
 				"description": "Short bursts of speed.",
 				"slot_type": "engine",
 				"icon_path": "res://items/plasma-core.png",
-				"resource_path": "res://item.gd"
+				"resource_path": "res://scripts/core/item.gd"
 			}
 		]
 		
 		# Convert starter_items to Item objects
 		for item_data in starter_items:
-			var resource_path = item_data.get("resource_path", "res://item.gd")
+			var resource_path = item_data.get("resource_path", "res://scripts/core/item.gd")
 			
 			# Create the correct resource type based on the slot_type
 			var item_resource
@@ -116,21 +116,57 @@ func load_game():
 			var item_name = item_data.get("name", "")
 			if slot_type == "weapon" and (resource_path == "res://components/laserWeapon.gd" or item_name.contains("Laser")):
 				item_resource = load("res://components/laserWeapon.gd")
+				if item_resource == null:
+					print("WARNING: Failed to load laserWeapon.gd, falling back to Item")
+					item_resource = load("res://scripts/core/item.gd")
 			elif slot_type == "weapon" and item_name.contains("Railgun"):
 				item_resource = load("res://components/railgunWeapon.gd")
+				if item_resource == null:
+					print("WARNING: Failed to load railgunWeapon.gd, falling back to Item")
+					item_resource = load("res://scripts/core/item.gd")
+			elif slot_type == "engine":
+				# For engine components, try to load the specific engine resource
+				if item_name.contains("Basic Thruster"):
+					item_resource = load("res://components/basic_engine.tres")
+				elif item_name.contains("Afterburner"):
+					# Load the afterburner engine resource
+					item_resource = load("res://components/afterburner_engine.tres")
+				else:
+					item_resource = load(resource_path)
+				if item_resource == null:
+					print("WARNING: Failed to load engine component, falling back to Item")
+					item_resource = load("res://scripts/core/item.gd")
 			else:
 				item_resource = load(resource_path)
 			
-			var item = item_resource.new()
-			item.name = item_data.get("name", "")
-			item.description = item_data.get("description", "")
-			item.icon_path = item_data.get("icon_path", "")
-			item.slot_type = item_data.get("slot_type", "")
-			item.stats = item_data.get("stats", {})
-			item.icon = null
-			if item.icon_path != "":
-				item.icon = load(item.icon_path)
-			item.resource_path = resource_path
+			# Check if resource loaded successfully
+			if item_resource == null:
+				print("ERROR: Failed to load resource: ", resource_path)
+				print("Item data: ", item_data)
+				continue
+			
+			var item
+			if item_resource is Resource and not item_resource is Script:
+				# For .tres files, we get an instance directly
+				item = item_resource
+				# Update the item with the data from the starter_items
+				item.name = item_data.get("name", "")
+				item.description = item_data.get("description", "")
+				item.slot_type = item_data.get("slot_type", "")
+				if item_data.get("icon_path", "") != "":
+					item.icon = load(item_data.get("icon_path", ""))
+			else:
+				# For .gd files, we need to instantiate
+				item = item_resource.new()
+				item.name = item_data.get("name", "")
+				item.description = item_data.get("description", "")
+				item.icon_path = item_data.get("icon_path", "")
+				item.slot_type = item_data.get("slot_type", "")
+				item.stats = item_data.get("stats", {})
+				item.icon = null
+				if item.icon_path != "":
+					item.icon = load(item.icon_path)
+				item.resource_path = resource_path
 			inventory.append(item)
 		return
 	var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
@@ -154,28 +190,28 @@ func load_game():
 				"description": "Basic kinetic weapon.",
 				"slot_type": "weapon",
 				"icon_path": "res://items/plasma-core.png",
-				"resource_path": "res://item.gd"
+				"resource_path": "res://scripts/core/item.gd"
 			},
 			{
 				"name": "Basic Thruster",
 				"description": "Reliable but slow thruster to get you around.",
 				"slot_type": "engine",
 				"icon_path": "res://items/basic_thruster.png",
-				"resource_path": "res://item.gd"
+				"resource_path": "res://scripts/core/item.gd"
 			},
 			{
 				"name": "Afterburner",
 				"description": "Short bursts of speed.",
 				"slot_type": "engine",
 				"icon_path": "res://items/plasma-core.png",
-				"resource_path": "res://item.gd"
+				"resource_path": "res://scripts/core/item.gd"
 			}
 		]
 		var loaded_inventory = result.get("inventory", starter_items)
 		for item_data in loaded_inventory:
-			var resource_path = item_data.get("resource_path", "res://item.gd")
+			var resource_path = item_data.get("resource_path", "res://scripts/core/item.gd")
 			if resource_path == "" or resource_path == "res://":
-				resource_path = "res://item.gd"
+				resource_path = "res://scripts/core/item.gd"
 			
 			# Create the correct resource type based on the slot_type
 			var item_resource
@@ -183,22 +219,58 @@ func load_game():
 			var item_name = item_data.get("name", "")
 			if slot_type == "weapon" and (resource_path == "res://components/laserWeapon.gd" or item_name.contains("Laser")):
 				item_resource = load("res://components/laserWeapon.gd")
+				if item_resource == null:
+					print("WARNING: Failed to load laserWeapon.gd, falling back to Item")
+					item_resource = load("res://scripts/core/item.gd")
 			elif slot_type == "weapon" and item_name.contains("Railgun"):
 				item_resource = load("res://components/railgunWeapon.gd")
+				if item_resource == null:
+					print("WARNING: Failed to load railgunWeapon.gd, falling back to Item")
+					item_resource = load("res://scripts/core/item.gd")
+			elif slot_type == "engine":
+				# For engine components, try to load the specific engine resource
+				if item_name.contains("Basic Thruster"):
+					item_resource = load("res://components/basic_engine.tres")
+				elif item_name.contains("Afterburner"):
+					# Load the afterburner engine resource
+					item_resource = load("res://components/afterburner_engine.tres")
+				else:
+					item_resource = load(resource_path)
+				if item_resource == null:
+					print("WARNING: Failed to load engine component, falling back to Item")
+					item_resource = load("res://scripts/core/item.gd")
 			else:
 				item_resource = load(resource_path)
 			
-			var item = item_resource.new()
-			item.name = item_data.get("name", "")
-			item.description = item_data.get("description", "")
-			item.icon_path = item_data.get("icon_path", "")
-			item.slot_type = item_data.get("slot_type", "")
-			item.stats = item_data.get("stats", {})
-			item.icon = null
-			if item.icon_path != "":
-				item.icon = load(item.icon_path)
-			# Don't set resource_path to avoid cyclic inclusion
-			# item.resource_path = resource_path
+			# Check if resource loaded successfully
+			if item_resource == null:
+				print("ERROR: Failed to load resource: ", resource_path)
+				print("Item data: ", item_data)
+				continue
+			
+			var item
+			if item_resource is Resource and not item_resource is Script:
+				# For .tres files, we get an instance directly
+				item = item_resource
+				# Update the item with the data from the loaded inventory
+				item.name = item_data.get("name", "")
+				item.description = item_data.get("description", "")
+				item.slot_type = item_data.get("slot_type", "")
+				if item_data.get("icon_path", "") != "":
+					item.icon = load(item_data.get("icon_path", ""))
+			else:
+				# For .gd files, we need to instantiate
+				item = item_resource.new()
+				item.name = item_data.get("name", "")
+				item.description = item_data.get("description", "")
+				item.icon_path = item_data.get("icon_path", "")
+				item.slot_type = item_data.get("slot_type", "")
+				item.stats = item_data.get("stats", {})
+				item.icon = null
+				if item.icon_path != "":
+					item.icon = load(item.icon_path)
+				# Don't set resource_path to avoid cyclic inclusion
+				# item.resource_path = resource_path
 			inventory.append(item)
 		equipped_components.clear()
 		var loaded_equipment = result.get("equipment", starter_items)
@@ -207,30 +279,67 @@ func load_game():
 			var items_data = loaded_equipment[slot]
 			var items_array = []
 			for item_data in items_data:
-				var resource_path = item_data.get("resource_path", "res://item.gd")
+				var resource_path = item_data.get("resource_path", "res://scripts/core/item.gd")
 				if resource_path == "" or resource_path == "res://":
-					resource_path = "res://item.gd"
+					resource_path = "res://scripts/core/item.gd"
 				
 				# Create the correct resource type based on the slot
 				var item_resource
 				if slot == "weapon" and (resource_path == "res://components/laserWeapon.gd" or item_data.get("name", "").contains("Laser")):
 					item_resource = load("res://components/laserWeapon.gd")
+					if item_resource == null:
+						print("WARNING: Failed to load laserWeapon.gd, falling back to Item")
+						item_resource = load("res://scripts/core/item.gd")
 				elif slot == "weapon" and item_data.get("name", "").contains("Railgun"):
 					item_resource = load("res://components/railgunWeapon.gd")
+					if item_resource == null:
+						print("WARNING: Failed to load railgunWeapon.gd, falling back to Item")
+						item_resource = load("res://scripts/core/item.gd")
+				elif slot == "engine":
+					# For engine components, try to load the specific engine resource
+					var item_name = item_data.get("name", "")
+					if item_name.contains("Basic Thruster"):
+						item_resource = load("res://components/basic_engine.tres")
+					elif item_name.contains("Afterburner"):
+						# Load the afterburner engine resource
+						item_resource = load("res://components/afterburner_engine.tres")
+					else:
+						item_resource = load(resource_path)
+					if item_resource == null:
+						print("WARNING: Failed to load engine component, falling back to Item")
+						item_resource = load("res://scripts/core/item.gd")
 				else:
 					item_resource = load(resource_path)
 				
-				var equipped_item = item_resource.new()
-				equipped_item.name = item_data.get("name", "")
-				equipped_item.description = item_data.get("description", "")
-				equipped_item.icon_path = item_data.get("icon_path", "")
-				equipped_item.slot_type = item_data.get("slot_type", "")
-				equipped_item.stats = item_data.get("stats", {})
-				equipped_item.icon = null
-				if equipped_item.icon_path != "":
-					equipped_item.icon = load(equipped_item.icon_path)
-				# Don't set resource_path to avoid cyclic inclusion
-				# equipped_item.resource_path = resource_path
+				# Check if resource loaded successfully
+				if item_resource == null:
+					print("ERROR: Failed to load resource: ", resource_path)
+					print("Item data: ", item_data)
+					continue
+				
+				var equipped_item
+				if item_resource is Resource and not item_resource is Script:
+					# For .tres files, we get an instance directly
+					equipped_item = item_resource
+					# Update the item with the data from the loaded equipment
+					equipped_item.name = item_data.get("name", "")
+					equipped_item.description = item_data.get("description", "")
+					equipped_item.slot_type = item_data.get("slot_type", "")
+					if item_data.get("icon_path", "") != "":
+						equipped_item.icon = load(item_data.get("icon_path", ""))
+				else:
+					# For .gd files, we need to instantiate
+					equipped_item = item_resource.new()
+					equipped_item.name = item_data.get("name", "")
+					equipped_item.description = item_data.get("description", "")
+					equipped_item.icon_path = item_data.get("icon_path", "")
+					equipped_item.slot_type = item_data.get("slot_type", "")
+					equipped_item.stats = item_data.get("stats", {})
+					equipped_item.icon = null
+					if equipped_item.icon_path != "":
+						equipped_item.icon = load(equipped_item.icon_path)
+					# Don't set resource_path to avoid cyclic inclusion
+					# equipped_item.resource_path = resource_path
 				items_array.append(equipped_item)
 			equipped_components[slot] = items_array
 	cleanup_null_items()

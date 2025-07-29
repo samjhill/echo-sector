@@ -5,5 +5,7 @@
 [resource]
 script = ExtResource("1_lq4qh")
 name = "Basic Engine"
+description = "Reliable but slow thruster to get you around."
+slot_type = "engine"
 move_speed_bonus = 100.0
 rotation_speed_bonus = 2.0

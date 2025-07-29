@@ -109,7 +109,7 @@ func update_health_ui():
 
 func die():
 	print("Player has died. Game Over.")
-	var game_over_screen = preload("res://game_over_screen.tscn").instantiate()
+	var game_over_screen = preload("res://scenes/ui/game_over_screen.tscn").instantiate()
 	get_tree().root.add_child(game_over_screen)
 	queue_free()
 	
@@ -246,7 +246,7 @@ func _trigger_hit_effects():
 
 func shoot_laser(weapon: LaserWeapon, target: Node2D):
 	print("shoot_laser called with weapon:", weapon.name, "target:", target.name)
-	var laser = preload("res://laser_projectile.tscn").instantiate()
+	var laser = preload("res://scenes/game/laser_projectile.tscn").instantiate()
 	
 	var direction = (target.global_position - global_position).normalized()
 	laser.global_position = global_position
@@ -293,7 +293,7 @@ func lock_on_target(target: Node2D):
 
 func shoot_railgun(weapon: RailgunWeapon, target: Node2D):
 	print("shoot_railgun called with weapon:", weapon.name, "target:", target.name)
-	var projectile = preload("res://projectile.tscn").instantiate()
+	var projectile = preload("res://scenes/game/projectile.tscn").instantiate()
 	
 	var direction = (target.global_position - global_position).normalized()
 	projectile.global_position = global_position

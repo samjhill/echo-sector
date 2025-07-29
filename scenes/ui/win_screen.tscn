@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://djx3yo164xjrr"]
 
-[ext_resource type="Script" uid="uid://bl6ulwxwiukyv" path="res://win_screen.gd" id="1_l2arl"]
-[ext_resource type="Texture2D" uid="uid://d1jbu5nbuijs1" path="res://starmap.png" id="2_wmwda"]
+[ext_resource type="Script" uid="uid://bl6ulwxwiukyv" path="res://scripts/ui/win_screen.gd" id="1_l2arl"]
+[ext_resource type="Texture2D" uid="uid://d1jbu5nbuijs1" path="res://assets/textures/starmap.png" id="2_wmwda"]
 [ext_resource type="AudioStream" uid="uid://cfij5oxsoruqf" path="res://music/echo-sector-victory.wav" id="3_l5t5q"]
 
 [node name="WinScreen" type="Control"]

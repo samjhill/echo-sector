@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b0g15rwjky8xv"
-path="res://.godot/imported/uranium.png-73f789fe63a3ec4275356db461ed9848.ctex"
+path="res://.godot/imported/uranium.png-4b50380eaa0be9c9924b18ede670e8c0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://uranium.png"
-dest_files=["res://.godot/imported/uranium.png-73f789fe63a3ec4275356db461ed9848.ctex"]
+source_file="res://assets/textures/uranium.png"
+dest_files=["res://.godot/imported/uranium.png-4b50380eaa0be9c9924b18ede670e8c0.ctex"]
 
 [params]
 

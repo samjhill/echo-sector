@@ -1,197 +1,275 @@
 # StellarGridUI.gd
 # UI controller for the Stellar Grid system
 extends Control
+class_name StellarGridUI
 
-signal item_placed_on_grid(grid_position: Vector2i, item: Item)
-signal item_removed_from_grid(grid_position: Vector2i, item: Item)
-
-# UI References
-var grid_container: GridContainer
-var inventory_panel: Panel
-var production_display: Label
-var grid_info_label: Label
-var close_button: Button
-
-# Grid management
-var grid_manager: GridManager
+# Grid properties
+var grid_size: Vector2i = Vector2i(3, 3)
+var grid_manager: GridManager = null
 var grid_tile_buttons: Array[Array] = []
 var selected_item: Item = null
-var drag_preview: TextureRect
 
-# Mobile-friendly removal system
+# UI elements
+var grid_container: GridContainer = null
+var inventory_panel: Panel = null
+var production_display: Label = null
+var grid_info_label: Label = null
+
+# Buff visual manager
+var buff_visual_manager: BuffVisualManager = null
+var buff_toggle_button: Button = null
+
+# Mobile-friendly input
 var long_press_timer: Timer
-var long_press_duration: float = 0.8  # 800ms for long press
+var long_press_duration: float = 0.8
 var pressed_tile: Vector2i = Vector2i(-1, -1)
 var is_long_pressing: bool = false
 
-# Grid configuration
-var grid_size: Vector2i = Vector2i(3, 3)  # Start with 3x3
-const TILE_SIZE := 60
-
 func _ready():
-	# Get references manually since scene is loaded dynamically
-	grid_container = $MainContainer/Content/TopRow/GridSection/GridContainer
-	inventory_panel = $MainContainer/Content/InventorySection/InventoryPanel
-	production_display = $MainContainer/Content/TopRow/InfoSection/ProductionDisplay
-	grid_info_label = $MainContainer/Content/TopRow/InfoSection/GridInfoLabel
-	close_button = $MainContainer/Header/CloseButton
+	Logger.info("Initializing Stellar Grid UI", "StellarGridUI")
 	
-	Logger.debug("Grid container found: %s" % (grid_container != null), "StellarGridUI")
-	Logger.debug("Inventory panel found: %s" % (inventory_panel != null), "StellarGridUI")
-	Logger.debug("Production display found: %s" % (production_display != null), "StellarGridUI")
-	Logger.debug("Grid info label found: %s" % (grid_info_label != null), "StellarGridUI")
-	Logger.debug("Close button found: %s" % (close_button != null), "StellarGridUI")
+	# Initialize buff visual manager
+	buff_visual_manager = BuffVisualManager.new()
+	add_child(buff_visual_manager)
 	
-	setup_grid_manager()
-	create_grid_ui()
-	setup_inventory_display()
-	connect_signals()
+	# Setup long press system for mobile
 	setup_long_press_system()
 	
-	# Check if tutorial should be shown
+	# Setup grid manager
+	setup_grid_manager()
+	
+	# Setup inventory display
+	setup_inventory_display()
+	
+	# Setup close button
+	setup_close_button()
+	
+	# Create grid UI after all setup is complete
+	await get_tree().process_frame
+	refresh_grid_ui()
+	
+	# Check for tutorial
 	if not PlayerData.get_tutorial_completed("stellar_grid", false):
 		start_tutorial()
-	else:
-		Logger.info("Tutorial already completed, skipping", "StellarGridUI")
 
 func setup_grid_manager():
-	"""Initialize the grid manager"""
+	"""Setup the grid manager and connect signals"""
 	grid_manager = GridManager.new()
+	add_child(grid_manager)  # Add as child so timer can work
+	
+	# Setup buff visual manager with grid manager
+	grid_manager.setup_buff_visual_manager(buff_visual_manager)
+	
+	# Connect signals
 	grid_manager.production_tick_completed.connect(_on_production_tick)
 	grid_manager.tile_placed.connect(_on_tile_placed)
 	grid_manager.tile_removed.connect(_on_tile_removed)
-	add_child(grid_manager)
 	
-	# Wait a frame for the grid manager to load data, then refresh UI
+	# Setup UI after grid manager is ready
 	await get_tree().process_frame
 	refresh_grid_ui()
 
-func refresh_grid_ui():
-	"""Refresh the grid UI to match the current grid state"""
-	create_grid_ui()
-	update_grid_display()
-	update_grid_info()
-
-func create_grid_ui():
-	"""Create the visual grid UI"""
-	# Get grid size from grid manager
-	if grid_manager != null:
-		grid_size = grid_manager.grid_size
-	
-	# Clear existing grid UI
-	clear_grid_ui()
-	
-	grid_container.columns = grid_size.x
-	
-	# Initialize grid tile buttons array
-	grid_tile_buttons.resize(grid_size.x)
-	for x in range(grid_size.x):
-		grid_tile_buttons[x] = []
-		grid_tile_buttons[x].resize(grid_size.y)
-		
-		for y in range(grid_size.y):
-			var tile_button = create_tile_button(Vector2i(x, y))
-			grid_container.add_child(tile_button)
-			grid_tile_buttons[x][y] = tile_button
-
-func clear_grid_ui():
-	"""Clear the existing grid UI"""
-	# Remove existing tile buttons
-	for child in grid_container.get_children():
-		child.queue_free()
-	
-	# Clear the buttons array
-	grid_tile_buttons.clear()
-
-func create_tile_button(grid_position: Vector2i) -> Button:
-	"""Create a button for a grid tile"""
-	var button = Button.new()
-	button.custom_minimum_size = Vector2(TILE_SIZE, TILE_SIZE)
-	button.text = "Empty"
-	button.name = "Tile_" + str(grid_position.x) + "_" + str(grid_position.y)
-	
-	# Style the button
-	button.add_theme_font_size_override("font_size", 10)
-	button.add_theme_color_override("font_color", Color.WHITE)
-	button.add_theme_color_override("font_hover_color", Color.YELLOW)
-	
-	# Connect signals for mobile-friendly interaction
-	button.pressed.connect(_on_tile_button_pressed.bind(grid_position))
-	button.gui_input.connect(_on_tile_gui_input.bind(grid_position))
-	
-	return button
-
-func setup_inventory_display():
-	"""Setup the inventory display panel"""
-	# This will be populated with grid-compatible items from player inventory
-	update_inventory_display()
-
-func connect_signals():
-	"""Connect all necessary signals"""
-	# Connect to player data changes
-	PlayerData.inventory_changed.connect(update_inventory_display)
-	
-	# Connect close button
-	if close_button != null:
-		close_button.pressed.connect(_on_close_button_pressed)
-
 func setup_long_press_system():
-	"""Setup the long press timer for mobile-friendly removal"""
+	"""Setup long press timer for mobile-friendly item removal"""
 	long_press_timer = Timer.new()
 	long_press_timer.wait_time = long_press_duration
 	long_press_timer.one_shot = true
 	long_press_timer.timeout.connect(_on_long_press_timeout)
 	add_child(long_press_timer)
 
+func create_grid_ui():
+	"""Create the grid UI elements"""
+	Logger.info("Creating grid UI", "StellarGridUI")
+	clear_grid_ui()
+	
+	# Debug: check scene structure
+	var main_container = $MainContainer
+	if main_container:
+		Logger.info("MainContainer found", "StellarGridUI")
+		var content = main_container.get_node_or_null("Content")
+		if content:
+			Logger.info("Content found", "StellarGridUI")
+			var top_row = content.get_node_or_null("TopRow")
+			if top_row:
+				Logger.info("TopRow found", "StellarGridUI")
+				var grid_section = top_row.get_node_or_null("GridSection")
+				if grid_section:
+					Logger.info("GridSection found", "StellarGridUI")
+					var grid_container_node = grid_section.get_node_or_null("GridContainer")
+					if grid_container_node:
+						Logger.info("GridContainer found", "StellarGridUI")
+					else:
+						Logger.error("GridContainer not found in GridSection", "StellarGridUI")
+				else:
+					Logger.error("GridSection not found in TopRow", "StellarGridUI")
+			else:
+				Logger.error("TopRow not found in Content", "StellarGridUI")
+		else:
+			Logger.error("Content not found in MainContainer", "StellarGridUI")
+	else:
+		Logger.error("MainContainer not found", "StellarGridUI")
+	
+	# Get grid container reference
+	grid_container = $MainContainer/Content/TopRow/GridSection/GridContainer
+	if not grid_container:
+		Logger.error("Grid container not found", "StellarGridUI")
+		# Try alternative paths
+		grid_container = get_node_or_null("MainContainer/Content/TopRow/GridSection/GridContainer")
+		if not grid_container:
+			Logger.error("Grid container not found with alternative path", "StellarGridUI")
+			return
+		else:
+			Logger.info("Grid container found with alternative path", "StellarGridUI")
+	else:
+		Logger.info("Grid container found", "StellarGridUI")
+	
+	# Log grid container properties
+	Logger.info("Grid container rect: %s" % grid_container.get_rect(), "StellarGridUI")
+	Logger.info("Grid container visible: %s" % grid_container.visible, "StellarGridUI")
+	Logger.info("Grid container children count: %d" % grid_container.get_child_count(), "StellarGridUI")
+	
+	# Set grid container to 3x3
+	grid_container.columns = 3
+	Logger.info("Set grid container to 3 columns", "StellarGridUI")
+	
+	# Setup buff visual manager with grid container
+	if buff_visual_manager:
+		buff_visual_manager.setup(grid_manager, grid_container)
+		Logger.info("Buff visual manager setup complete", "StellarGridUI")
+	
+	# Create grid buttons
+	Logger.info("Creating %dx%d grid buttons" % [grid_size.x, grid_size.y], "StellarGridUI")
+	for x in range(grid_size.x):
+		var column: Array[Button] = []
+		for y in range(grid_size.y):
+			var button = create_tile_button(Vector2i(x, y))
+			grid_container.add_child(button)
+			column.append(button)
+			Logger.debug("Created button for position (%d, %d) - visible: %s" % [x, y, button.visible], "StellarGridUI")
+		grid_tile_buttons.append(column)
+	
+	Logger.info("Created %dx%d grid UI with %d buttons" % [grid_size.x, grid_size.y, grid_tile_buttons.size() * grid_tile_buttons[0].size() if grid_tile_buttons.size() > 0 else 0], "StellarGridUI")
+	Logger.info("Grid container final children count: %d" % grid_container.get_child_count(), "StellarGridUI")
+
+func create_tile_button(grid_position: Vector2i) -> Button:
+	"""Create a button for a grid tile"""
+	var button = Button.new()
+	button.text = "Empty"
+	button.custom_minimum_size = Vector2(60, 60)
+	
+	# Style the button
+	button.add_theme_font_size_override("font_size", 10)
+	button.add_theme_color_override("font_color", Color.WHITE)
+	button.add_theme_color_override("font_hover_color", Color.YELLOW)
+	
+	# Connect signals
+	button.pressed.connect(_on_tile_button_pressed.bind(grid_position))
+	button.gui_input.connect(_on_tile_gui_input.bind(grid_position))
+	
+	return button
+
+func clear_grid_ui():
+	"""Clear all existing grid UI elements"""
+	if grid_container:
+		for child in grid_container.get_children():
+			child.queue_free()
+	grid_tile_buttons.clear()
+
+func refresh_grid_ui():
+	"""Refresh the entire grid UI"""
+	create_grid_ui()
+	update_grid_display()
+	update_grid_info()
+
+func setup_inventory_display():
+	"""Setup the inventory display"""
+	Logger.info("Setting up inventory display", "StellarGridUI")
+	
+	# Get inventory panel reference - fixed path to match scene structure
+	inventory_panel = $MainContainer/Content/InventorySection/InventoryPanel
+	if not inventory_panel:
+		Logger.error("Inventory panel not found", "StellarGridUI")
+		return
+	else:
+		Logger.info("Inventory panel found", "StellarGridUI")
+	
+	# Get production display reference
+	production_display = $MainContainer/Content/TopRow/InfoSection/ProductionDisplay
+	if not production_display:
+		Logger.error("Production display not found", "StellarGridUI")
+		return
+	else:
+		Logger.info("Production display found", "StellarGridUI")
+	
+	# Get grid info label reference
+	grid_info_label = $MainContainer/Content/TopRow/InfoSection/GridInfoLabel
+	if not grid_info_label:
+		Logger.error("Grid info label not found", "StellarGridUI")
+		return
+	else:
+		Logger.info("Grid info label found", "StellarGridUI")
+	
+	# Create buff toggle button
+	create_buff_toggle_button()
+	
+	# Update displays
+	update_inventory_display()
+	if production_display:
+		update_production_display({})
+	
+	Logger.info("Inventory display setup complete", "StellarGridUI")
+
+func create_buff_toggle_button():
+	"""Create a toggle button for buff visuals"""
+	buff_toggle_button = Button.new()
+	buff_toggle_button.text = "Show Buffs"
+	buff_toggle_button.custom_minimum_size = Vector2(100, 30)
+	
+	# Style the button
+	buff_toggle_button.add_theme_font_size_override("font_size", 12)
+	buff_toggle_button.add_theme_color_override("font_color", Color.WHITE)
+	buff_toggle_button.add_theme_color_override("font_hover_color", Color.YELLOW)
+	
+	# Connect signal
+	buff_toggle_button.pressed.connect(_on_buff_toggle_pressed)
+	
+	# Add to info section
+	var info_section = $MainContainer/Content/TopRow/InfoSection
+	if info_section:
+		info_section.add_child(buff_toggle_button)
+		Logger.info("Buff toggle button created", "StellarGridUI")
+
+func _on_buff_toggle_pressed():
+	"""Handle buff toggle button press"""
+	if buff_visual_manager:
+		buff_visual_manager.toggle_buff_visuals()
+		buff_toggle_button.text = "Hide Buffs" if buff_visual_manager.show_buff_visuals else "Show Buffs"
+		Logger.info("Buff visuals toggled", "StellarGridUI")
+
 func update_inventory_display():
-	"""Update the inventory display with grid-compatible items"""
-	# Check if inventory panel exists
-	if inventory_panel == null:
-		Logger.error("Inventory panel is null", "StellarGridUI")
+	"""Update the inventory display with available grid-compatible items"""
+	if not inventory_panel:
 		return
 	
-	Logger.debug("Inventory panel found: %s" % inventory_panel.name, "StellarGridUI")
+	# Get inventory VBox - fixed path to match scene structure
+	var inventory_vbox = inventory_panel.get_node_or_null("InventoryScroll/InventoryVBox")
+	if not inventory_vbox:
+		Logger.error("Inventory VBox not found", "StellarGridUI")
+		return
 	
-	# Clear existing inventory display
-	var inventory_vbox = inventory_panel.get_node("InventoryScroll/InventoryVBox")
-	if inventory_vbox != null:
-		for child in inventory_vbox.get_children():
-			if child.has_method("queue_free"):
-				child.queue_free()
-		
-		# Create inventory items display
-		var grid_items = get_grid_compatible_items()
-		Logger.info("Found %d grid-compatible items in inventory" % grid_items.size(), "StellarGridUI")
-		for item in grid_items:
-			Logger.debug("  - %s (%s)" % [item.name, item.type], "StellarGridUI")
-			var item_button = create_inventory_item_button(item)
-			inventory_vbox.add_child(item_button)
-	else:
-		Logger.error("Could not find InventoryVBox in inventory panel", "StellarGridUI")
-		# Try alternative path
-		inventory_vbox = inventory_panel.get_node("InventoryScroll/InventoryVBox")
-		if inventory_vbox != null:
-			Logger.debug("Found inventory vbox with alternative path", "StellarGridUI")
-			for child in inventory_vbox.get_children():
-				if child.has_method("queue_free"):
-					child.queue_free()
-			
-			var grid_items = get_grid_compatible_items()
-			Logger.info("Found %d grid-compatible items in inventory" % grid_items.size(), "StellarGridUI")
-			for item in grid_items:
-				Logger.debug("  - %s (%s)" % [item.name, item.type], "StellarGridUI")
-				var item_button = create_inventory_item_button(item)
-				inventory_vbox.add_child(item_button)
-		else:
-			Logger.error("Could not find InventoryVBox with any path", "StellarGridUI")
-			# Debug: print the actual structure
-			Logger.debug("Inventory panel children:", "StellarGridUI")
-			for child in inventory_panel.get_children():
-				Logger.debug("  - %s (%s)" % [child.name, child.get_class()], "StellarGridUI")
-				if child.name == "InventoryScroll":
-					Logger.debug("    InventoryScroll children:", "StellarGridUI")
-					for grandchild in child.get_children():
-						Logger.debug("      - %s (%s)" % [grandchild.name, grandchild.get_class()], "StellarGridUI")
+	# Clear existing items
+	for child in inventory_vbox.get_children():
+		child.queue_free()
+	
+	# Get grid-compatible items
+	var compatible_items = get_grid_compatible_items()
+	Logger.debug("Found %d grid-compatible items" % compatible_items.size(), "StellarGridUI")
+	
+	# Create buttons for each item
+	for item in compatible_items:
+		var button = create_inventory_item_button(item)
+		inventory_vbox.add_child(button)
+		Logger.debug("Added inventory item: %s" % item.name, "StellarGridUI")
 
 func get_grid_compatible_items() -> Array[Item]:
 	"""Get items from inventory that can be placed on the grid"""
@@ -234,6 +312,8 @@ func _on_tile_button_pressed(grid_position: Vector2i):
 	"""Handle tile button press for item placement"""
 	if selected_item != null:
 		if grid_manager.place_item(grid_position, selected_item):
+			# Remove the item from inventory when successfully placed
+			PlayerData.remove_item_from_inventory(selected_item)
 			selected_item = null
 			update_grid_display()
 			update_inventory_display()
@@ -244,6 +324,11 @@ func _on_tile_button_pressed(grid_position: Vector2i):
 		var tile = grid_manager.get_tile(grid_position)
 		var item = tile.get_item()
 		Logger.info("Tile at %s contains: %s" % [grid_position, item.name], "StellarGridUI")
+		
+		# Show buff info if available
+		if buff_visual_manager:
+			var buff_info = buff_visual_manager.get_buff_info_for_tile(tile)
+			Logger.info("Buff info: %s" % buff_info, "StellarGridUI")
 	else:
 		Logger.debug("No item selected and tile is empty", "StellarGridUI")
 
@@ -292,8 +377,7 @@ func remove_item_from_tile(grid_position: Vector2i):
 		var removed_item = grid_manager.remove_item(grid_position)
 		if removed_item != null:
 			Logger.info("Removed %s from position %s" % [removed_item.name, grid_position], "StellarGridUI")
-			# Add item back to inventory
-			PlayerData.add_item_to_inventory(removed_item)
+			# Removed duplicate add_item_to_inventory call
 			update_grid_display()
 			update_inventory_display()
 			show_removal_feedback(grid_position)
@@ -327,7 +411,7 @@ func show_long_press_indicator(grid_position: Vector2i, show: bool):
 	
 	# Remove existing indicator
 	var existing_indicator = tile_button.get_node_or_null("LongPressIndicator")
-	if existing_indicator != null:
+	if existing_indicator:
 		existing_indicator.queue_free()
 	
 	if show:
@@ -340,7 +424,7 @@ func show_long_press_indicator(grid_position: Vector2i, show: bool):
 		indicator.anchor_bottom = 1.0
 		tile_button.add_child(indicator)
 		
-		# Animate the indicator
+		# Animate pulsing
 		var tween = create_tween()
 		tween.set_loops()
 		tween.tween_property(indicator, "modulate:a", 0.6, 0.4)
@@ -402,7 +486,7 @@ func update_tile_display(grid_position: Vector2i):
 	if tile.is_occupied():
 		var item = tile.get_item()
 		button.text = item.name
-		button.modulate = Color.GREEN
+		button.modulate = tile.get_display_color()  # Use the new color system
 	else:
 		button.text = "Empty"
 		button.modulate = Color.WHITE
@@ -412,6 +496,10 @@ func update_tile_display(grid_position: Vector2i):
 
 func update_production_display(resources_generated: Dictionary):
 	"""Update the production display with generated resources"""
+	if not production_display:
+		Logger.warning("Production display is null, cannot update", "StellarGridUI")
+		return
+	
 	var display_text = "Last Production Tick:\n"
 	
 	for resource_type in resources_generated:
@@ -426,6 +514,10 @@ func update_production_display(resources_generated: Dictionary):
 
 func update_grid_info():
 	"""Update the grid information display"""
+	if not grid_info_label:
+		Logger.warning("Grid info label is null, cannot update", "StellarGridUI")
+		return
+	
 	var occupied_tiles = 0
 	var total_tiles = grid_size.x * grid_size.y
 	
@@ -442,7 +534,13 @@ func update_grid_info():
 	grid_info_label.text = info_text
 
 func _input(event):
-	"""Handle input for drag and drop system"""
+	"""Handle input for drag and drop system and keyboard shortcuts"""
+	if event is InputEventKey and event.pressed:
+		# Toggle buff visuals with 'B' key
+		if event.keycode == KEY_B:
+			_on_buff_toggle_pressed()
+			Logger.info("Buff visuals toggled via keyboard", "StellarGridUI")
+	
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			# Handle click events
@@ -481,28 +579,33 @@ func start_tutorial():
 	tutorial_text.anchor_right = 0.95
 	tutorial_text.anchor_top = 0.05
 	tutorial_text.anchor_bottom = 0.75
-	tutorial_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tutorial_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	tutorial_text.vertical_alignment = VERTICAL_ALIGNMENT_TOP
+	tutorial_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	tutorial_panel.add_child(tutorial_text)
 	
 	var close_button = Button.new()
 	close_button.text = "Got it!"
-	close_button.anchor_left = 0.3
-	close_button.anchor_right = 0.7
 	close_button.anchor_top = 0.8
 	close_button.anchor_bottom = 0.9
+	close_button.anchor_left = 0.4
+	close_button.anchor_right = 0.6
 	close_button.pressed.connect(func(): 
 		tutorial_overlay.queue_free()
-		_on_tutorial_completed()
+		PlayerData.set_tutorial_completed("stellar_grid", true)
 	)
-	tutorial_panel.add_child(close_button)
+	tutorial_panel.add_child(close_button) 
 
-func _on_tutorial_completed():
-	"""Handle tutorial completion"""
-	print("Tutorial completed!")
-	PlayerData.set_tutorial_completed("stellar_grid", true)
+func setup_close_button():
+	"""Setup the close button functionality"""
+	var close_button = $MainContainer/Header/CloseButton
+	if close_button:
+		close_button.pressed.connect(_on_close_button_pressed)
+		Logger.info("Close button connected", "StellarGridUI")
+	else:
+		Logger.error("Close button not found", "StellarGridUI")
 
 func _on_close_button_pressed():
 	"""Handle close button press"""
+	Logger.info("Close button pressed, hiding stellar grid", "StellarGridUI")
 	visible = false 

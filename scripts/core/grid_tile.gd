@@ -16,14 +16,23 @@ enum TileState { EMPTY, OCCUPIED, LOCKED }
 @export var highlight_color: Color = Color.YELLOW
 @export var occupied_color: Color = Color.GREEN
 
+# Buff visual properties
+@export var is_buffing_adjacent: bool = false
+@export var is_receiving_buff: bool = false
+@export var buff_source_positions: Array[Vector2i] = []
+@export var buff_target_positions: Array[Vector2i] = []
+
 signal tile_state_changed(new_state: TileState)
 signal item_placed(item: Item)
 signal item_removed(item: Item)
+signal buff_visuals_changed()
 
 func _init():
 	grid_position = Vector2i.ZERO
 	tile_state = TileState.EMPTY
 	placed_item = null
+	buff_source_positions = []
+	buff_target_positions = []
 
 func place_item(item: Item) -> bool:
 	"""Place an item on this tile"""
@@ -55,6 +64,9 @@ func remove_item() -> Item:
 	item_removed.emit(removed_item)
 	tile_state_changed.emit(tile_state)
 	
+	# Clear buff visuals when item is removed
+	clear_buff_visuals()
+	
 	print("Removed ", removed_item.name, " from tile at: ", grid_position)
 	return removed_item
 
@@ -78,12 +90,39 @@ func set_highlight(highlight: bool):
 	"""Set the highlight state of the tile"""
 	is_highlighted = highlight
 
+func clear_buff_visuals():
+	"""Clear all buff visual states"""
+	is_buffing_adjacent = false
+	is_receiving_buff = false
+	buff_source_positions.clear()
+	buff_target_positions.clear()
+	buff_visuals_changed.emit()
+
+func set_buffing_adjacent(target_positions: Array[Vector2i]):
+	"""Set this tile as buffing adjacent tiles"""
+	is_buffing_adjacent = true
+	buff_target_positions = target_positions
+	buff_visuals_changed.emit()
+
+func set_receiving_buff(source_positions: Array[Vector2i]):
+	"""Set this tile as receiving buffs from adjacent tiles"""
+	is_receiving_buff = true
+	buff_source_positions = source_positions
+	buff_visuals_changed.emit()
+
 func get_display_color() -> Color:
 	"""Get the appropriate color for displaying this tile"""
 	if is_highlighted:
 		return highlight_color
 	elif tile_state == TileState.OCCUPIED:
-		return occupied_color
+		if is_buffing_adjacent and is_receiving_buff:
+			return Color.CYAN  # Both buffing and receiving
+		elif is_buffing_adjacent:
+			return Color.BLUE  # Buffing others
+		elif is_receiving_buff:
+			return Color.MAGENTA  # Receiving buffs
+		else:
+			return occupied_color
 	else:
 		return tile_color
 
@@ -93,6 +132,10 @@ func get_tile_info() -> Dictionary:
 		"position": grid_position,
 		"state": tile_state,
 		"is_highlighted": is_highlighted,
+		"is_buffing_adjacent": is_buffing_adjacent,
+		"is_receiving_buff": is_receiving_buff,
+		"buff_sources": buff_source_positions.size(),
+		"buff_targets": buff_target_positions.size(),
 		"item_name": "",
 		"item_description": "",
 		"production_info": {}

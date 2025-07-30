@@ -1,136 +1,136 @@
 # GridManager.gd
-# Manages the Stellar Grid system - a 5x5 tile-based strategic subsystem
+# Manages the Stellar Grid system - a tile-based strategic subsystem
 extends Node
 class_name GridManager
 
-signal production_tick_completed(resources_generated: Dictionary)
-signal tile_placed(grid_position: Vector2i, item: Item)
-signal tile_removed(grid_position: Vector2i)
-
-# Grid configuration
-var grid_size: Vector2i = Vector2i(3, 3)  # Start with 3x3
-const PRODUCTION_INTERVAL := 5.0  # seconds between production ticks
-
-# Grid data structure
-var grid_tiles: Array[Array] = []  # 2D array of GridTile nodes
+# Grid properties
+var grid_size: Vector2i = Vector2i(3, 3)
+var grid_tiles: Array[Array] = []
 var production_timer: Timer
-var grid_container: GridContainer
-var progression_system: GridProgression
+var last_production_time: int = 0
 
 # Production tracking
-var last_production_time: float = 0.0
 var total_resources_generated: Dictionary = {}
 
+# Progression system
+var progression_system: GridProgression = null
+
+# Buff visual manager
+var buff_visual_manager: BuffVisualManager = null
+
+# Signals
+signal tile_placed(grid_position: Vector2i, item: Item)
+signal tile_removed(grid_position: Vector2i, item: Item)
+signal production_tick_completed(resources_generated: Dictionary)
+signal grid_expanded(new_size: Vector2i)
+signal modifier_applied(modifier: Dictionary)
+signal event_triggered(event: Dictionary)
+
 func _ready():
-	setup_progression_system()
+	Logger.info("Initializing GridManager", "GridManager")
 	initialize_grid()
 	setup_production_timer()
 	load_grid_data()
 
-func setup_progression_system():
-	"""Setup the progression system"""
-	progression_system = GridProgression.new()
-	progression_system.grid_expanded.connect(_on_grid_expanded)
-	progression_system.modifier_applied.connect(_on_modifier_applied)
-	progression_system.event_triggered.connect(_on_event_triggered)
-	add_child(progression_system)
-	
-	# Update grid size from progression
-	grid_size = progression_system.current_grid_size
-
 func initialize_grid():
-	"""Initialize the grid with empty GridTile nodes"""
-	grid_tiles.resize(grid_size.x)
+	"""Initialize the grid with empty tiles"""
+	grid_tiles.clear()
+	
 	for x in range(grid_size.x):
-		grid_tiles[x] = []
-		grid_tiles[x].resize(grid_size.y)
+		var column: Array[GridTile] = []
 		for y in range(grid_size.y):
 			var tile = GridTile.new()
 			tile.grid_position = Vector2i(x, y)
-			tile.tile_state = GridTile.TileState.EMPTY
-			grid_tiles[x][y] = tile
+			column.append(tile)
+		grid_tiles.append(column)
+	
+	Logger.info("Initialized %dx%d grid" % [grid_size.x, grid_size.y], "GridManager")
 
 func setup_production_timer():
-	"""Setup the production timer for periodic resource generation"""
+	"""Setup the production timer for resource generation"""
 	production_timer = Timer.new()
-	production_timer.wait_time = PRODUCTION_INTERVAL
+	production_timer.wait_time = 5.0  # 5 seconds between production ticks
 	production_timer.timeout.connect(_on_production_tick)
 	add_child(production_timer)
 	production_timer.start()
+	Logger.info("Production timer started (5s intervals)", "GridManager")
+
+func setup_buff_visual_manager(visual_manager: BuffVisualManager):
+	"""Setup the buff visual manager"""
+	buff_visual_manager = visual_manager
+	if buff_visual_manager:
+		buff_visual_manager.setup(self, null)  # grid_container will be set by UI
+		Logger.info("Buff visual manager connected", "GridManager")
 
 func load_grid_data():
-	"""Load grid data from save file if it exists"""
-	var save_path = "user://stellar_grid_save.json"
-	if FileAccess.file_exists(save_path):
-		var file = FileAccess.open(save_path, FileAccess.READ)
-		var json_string = file.get_as_text()
-		file.close()
-		
-		var json = JSON.new()
-		var parse_result = json.parse(json_string)
-		if parse_result == OK:
-			var data = json.data
-			Logger.debug("Loaded grid data structure: %s" % data, "GridManager")
-			
-			# Load placed tiles first (before changing grid size)
-			var tiles_to_load = []
-			if data.has("tiles"):
-				for tile_data in data.tiles:
-					var position_data = tile_data.position
-					var position: Vector2i
-					
-					if position_data is Dictionary:
-						position = Vector2i(position_data.x, position_data.y)
-					elif position_data is Array and position_data.size() >= 2:
-						position = Vector2i(position_data[0], position_data[1])
-					else:
-						Logger.warning("Invalid position format in tile data", "GridManager")
-						continue
-					
-					var item_name = tile_data.item_name
-					var item_type = tile_data.item_type
-					
-					tiles_to_load.append({
-						"position": position,
-						"item_name": item_name,
-						"item_type": item_type
-					})
-			
-			# Load grid size if it exists
-			if data.has("grid_size"):
-				var grid_size_data = data.grid_size
-				if grid_size_data is Dictionary:
-					grid_size = Vector2i(grid_size_data.x, grid_size_data.y)
-				elif grid_size_data is Array and grid_size_data.size() >= 2:
-					grid_size = Vector2i(grid_size_data[0], grid_size_data[1])
-				else:
-					Logger.warning("Invalid grid_size format in save data", "GridManager")
-					grid_size = Vector2i(3, 3)  # Default fallback
-			
-			# Reinitialize grid with new size
-			initialize_grid()
-			
-			# Now place the items on the newly initialized grid
-			for tile_data in tiles_to_load:
-				var item = find_item_by_name(tile_data.item_name)
-				if item != null:
-					var position = tile_data.position
-					# Check if position is valid for the new grid size
-					if is_valid_position(position):
-						var tile = grid_tiles[position.x][position.y]
-						tile.place_item(item)
-						tile_placed.emit(position, item)
-						Logger.info("Loaded item %s at position %s" % [tile_data.item_name, position], "GridManager")
-					else:
-						Logger.warning("Position %s is invalid for grid size %s" % [position, grid_size], "GridManager")
-				else:
-					Logger.warning("Could not find item %s for loading" % tile_data.item_name, "GridManager")
-			
-			Logger.info("Grid data loaded from save file", "GridManager")
-		else:
-			Logger.error("Error parsing grid save data", "GridManager")
-	else:
+	"""Load grid data from save file"""
+	if not FileAccess.file_exists("user://stellar_grid_save.json"):
 		Logger.info("No grid save file found, starting with empty grid", "GridManager")
+		return
+	
+	var file = FileAccess.open("user://stellar_grid_save.json", FileAccess.READ)
+	var json_string = file.get_as_text()
+	file.close()
+	
+	var json = JSON.new()
+	var parse_result = json.parse(json_string)
+	
+	if parse_result == OK:
+		var data = json.data
+		var tiles_to_load = []
+		
+		# Collect tiles to load first
+		if data.has("tiles"):
+			for tile_data in data.tiles:
+				var position_data = tile_data.get("position", {})
+				var position: Vector2i
+				
+				if position_data is Dictionary:
+					position = Vector2i(position_data.x, position_data.y)
+				elif position_data is Array and position_data.size() >= 2:
+					position = Vector2i(position_data[0], position_data[1])
+				else:
+					Logger.warning("Invalid position format in save data: %s" % position_data, "GridManager")
+					continue
+				
+				tiles_to_load.append({
+					"position": position,
+					"item_name": tile_data.get("item_name", "")
+				})
+		
+		# Update grid size if needed
+		if data.has("grid_size"):
+			var grid_size_data = data.grid_size
+			if grid_size_data is Dictionary:
+				grid_size = Vector2i(grid_size_data.x, grid_size_data.y)
+			elif grid_size_data is Array and grid_size_data.size() >= 2:
+				grid_size = Vector2i(grid_size_data[0], grid_size_data[1])
+			else:
+				Logger.warning("Invalid grid_size format in save data", "GridManager")
+				grid_size = Vector2i(3, 3)  # Default fallback
+		
+		# Reinitialize grid with new size
+		initialize_grid()
+		
+		# Now place the items on the newly initialized grid
+		for tile_data in tiles_to_load:
+			var item = find_item_by_name(tile_data.item_name)
+			if item != null:
+				var position = tile_data.position
+				# Check if position is valid for the new grid size
+				if is_valid_position(position):
+					var tile = grid_tiles[position.x][position.y]
+					tile.place_item(item)
+					tile_placed.emit(position, item)
+					Logger.info("Loaded item %s at position %s" % [tile_data.item_name, position], "GridManager")
+				else:
+					Logger.warning("Position %s is invalid for grid size %s" % [position, grid_size], "GridManager")
+			else:
+				Logger.warning("Could not find item %s for loading" % tile_data.item_name, "GridManager")
+		
+		Logger.info("Grid data loaded from save file", "GridManager")
+	else:
+		Logger.error("Error parsing grid save data", "GridManager")
 
 func save_grid_data():
 	"""Save current grid state to file"""
@@ -168,8 +168,8 @@ func place_item(grid_position: Vector2i, item: Item) -> bool:
 	tile.place_item(item)
 	tile_placed.emit(grid_position, item)
 	
-	# Remove item from inventory
-	PlayerData.remove_item_from_inventory(item)
+	# Update buff visuals
+	_update_buff_visuals_for_tile(tile)
 	
 	# Save grid state
 	save_grid_data()
@@ -190,9 +190,29 @@ func remove_item(grid_position: Vector2i) -> Item:
 	if item:
 		PlayerData.add_item_to_inventory(item)
 		tile_removed.emit(grid_position, item)
+		
+		# Update buff visuals after removal
+		_update_buff_visuals_after_removal(grid_position)
+		
 		save_grid_data()
 	
 	return item
+
+func _update_buff_visuals_for_tile(tile: GridTile):
+	"""Update buff visuals when a tile is placed"""
+	if buff_visual_manager:
+		buff_visual_manager.update_all_buff_visuals()
+
+func _update_buff_visuals_after_removal(removed_position: Vector2i):
+	"""Update buff visuals after a tile is removed"""
+	if buff_visual_manager:
+		# Clear buff states for adjacent tiles
+		var adjacent_tiles = get_adjacent_tiles(removed_position)
+		for adjacent_tile in adjacent_tiles:
+			adjacent_tile.clear_buff_visuals()
+		
+		# Update all buff visuals
+		buff_visual_manager.update_all_buff_visuals()
 
 func is_valid_position(position: Vector2i) -> bool:
 	"""Check if a grid position is valid"""

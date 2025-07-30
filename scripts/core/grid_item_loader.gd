@@ -25,12 +25,17 @@ static func load_grid_items() -> Dictionary:
 	
 	var data = json.data
 	var grid_items = data.get("grid_items", {})
+	print("Found %d grid items in JSON" % grid_items.size())
+	print("Grid item keys: ", grid_items.keys())
 	
 	for item_id in grid_items:
 		var item_data = grid_items[item_id]
 		var item = create_item_from_data(item_data)
 		if item != null:
 			items[item_id] = item
+			print("Created item: %s (%s)" % [item.name, item_id])
+		else:
+			print("Failed to create item for ID: %s" % item_id)
 	
 	print("Loaded ", items.size(), " grid items")
 	return items
@@ -76,6 +81,8 @@ static func add_starter_grid_items_to_inventory():
 	]
 	
 	var all_items = load_grid_items()
+	print("Loaded %d total grid items" % all_items.size())
+	print("Available item IDs: ", all_items.keys())
 	
 	for item_id in starter_items:
 		if item_id in all_items:

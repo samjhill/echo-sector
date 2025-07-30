@@ -52,6 +52,10 @@
 				"production": {
 					"research_points": 1,
 					"blueprint_fragments": 1
+				},
+				"adjacency_bonus": {
+					"type": "research",
+					"bonus": 0.15
 				}
 			},
 			"effects": []
@@ -69,27 +73,6 @@
 			"stats": {
 				"production": {
 					"scrap": 3
-				}
-			},
-			"effects": []
-		},
-		"research_lab_mk1": {
-			"name": "Research Lab Mk I",
-			"description": "Generates research points for blueprint development.",
-			"type": "grid_module",
-			"slot_type": "grid_module",
-			"icon_path": "res://assets/textures/portal.png",
-			"resource_path": "res://scripts/core/item.gd",
-			"is_equippable": false,
-			"is_stackable": false,
-			"max_stack": 1,
-			"stats": {
-				"production": {
-					"research_points": 1
-				},
-				"adjacency_bonus": {
-					"type": "research",
-					"bonus": 0.15
 				}
 			},
 			"effects": []

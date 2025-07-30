@@ -51,6 +51,8 @@ func _ready():
 	# Check for tutorial
 	if not PlayerData.get_tutorial_completed("stellar_grid", false):
 		start_tutorial()
+	
+	Logger.info("Stellar Grid UI initialization complete", "StellarGridUI")
 
 func setup_grid_manager():
 	"""Setup the grid manager and connect signals"""
@@ -189,6 +191,7 @@ func setup_inventory_display():
 	inventory_panel = $MainContainer/Content/InventorySection/InventoryPanel
 	if not inventory_panel:
 		Logger.error("Inventory panel not found", "StellarGridUI")
+		Logger.error("Available nodes: %s" % get_children(), "StellarGridUI")
 		return
 	else:
 		Logger.info("Inventory panel found", "StellarGridUI")
@@ -197,7 +200,7 @@ func setup_inventory_display():
 	production_display = $MainContainer/Content/TopRow/InfoSection/ProductionDisplay
 	if not production_display:
 		Logger.error("Production display not found", "StellarGridUI")
-		return
+		# Don't return, as this is not critical
 	else:
 		Logger.info("Production display found", "StellarGridUI")
 	
@@ -205,7 +208,7 @@ func setup_inventory_display():
 	grid_info_label = $MainContainer/Content/TopRow/InfoSection/GridInfoLabel
 	if not grid_info_label:
 		Logger.error("Grid info label not found", "StellarGridUI")
-		return
+		# Don't return, as this is not critical
 	else:
 		Logger.info("Grid info label found", "StellarGridUI")
 	
@@ -249,6 +252,7 @@ func _on_buff_toggle_pressed():
 func update_inventory_display():
 	"""Update the inventory display with available grid-compatible items"""
 	if not inventory_panel:
+		Logger.error("Inventory panel not found", "StellarGridUI")
 		return
 	
 	# Get inventory VBox - fixed path to match scene structure
@@ -267,9 +271,20 @@ func update_inventory_display():
 	
 	# Create buttons for each item
 	for item in compatible_items:
-		var button = create_inventory_item_button(item)
-		inventory_vbox.add_child(button)
-		Logger.debug("Added inventory item: %s" % item.name, "StellarGridUI")
+		if item != null:
+			var button = create_inventory_item_button(item)
+			inventory_vbox.add_child(button)
+			Logger.debug("Added inventory item: %s" % item.name, "StellarGridUI")
+		else:
+			Logger.warning("Found null item in compatible_items", "StellarGridUI")
+	
+	# If no items available, show a message
+	if compatible_items.size() == 0:
+		var no_items_label = Label.new()
+		no_items_label.text = "No grid modules available"
+		no_items_label.add_theme_color_override("font_color", Color.GRAY)
+		inventory_vbox.add_child(no_items_label)
+		Logger.info("No grid modules available, showing message", "StellarGridUI")
 
 func get_grid_compatible_items() -> Array[Item]:
 	"""Get items from inventory that can be placed on the grid"""

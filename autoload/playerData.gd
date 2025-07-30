@@ -263,7 +263,13 @@ func load_game():
 						# equipped_item.resource_path = resource_path
 					items_array.append(equipped_item)
 				equipped_components[slot] = items_array
-	cleanup_null_items()
+			
+			# Ensure existing players have Stellar Grid starter items
+			ensure_stellar_grid_starter_items()
+			
+			cleanup_null_items()
+		else:
+			Logger.error("Failed to parse save file JSON", "PlayerData")
 
 func cleanup_null_items():
 	"""Remove null items from inventory and equipped components"""
@@ -358,3 +364,28 @@ func set_tutorial_completed(tutorial_name: String, completed: bool):
 func get_tutorial_completed(tutorial_name: String, default_value: bool = false) -> bool:
 	"""Get tutorial completion status"""
 	return tutorial_completed.get(tutorial_name, default_value)
+
+func ensure_stellar_grid_starter_items():
+	"""Ensure that existing players have the Stellar Grid starter items"""
+	var starter_item_names = ["Power Core Mk I", "Extractor Mk I", "Research Lab Mk I"]
+	var has_all_starter_items = true
+	
+	# Check if player has all starter items
+	for item_name in starter_item_names:
+		var has_item = false
+		for item in inventory:
+			if item != null and item.name == item_name:
+				has_item = true
+				break
+		if not has_item:
+			has_all_starter_items = false
+			break
+	
+	# If missing any starter items, add them
+	if not has_all_starter_items:
+		Logger.info("Adding missing Stellar Grid starter items to existing player", "PlayerData")
+		GridItemLoader.add_starter_grid_items_to_inventory()
+		
+		# Also ensure tutorial completion tracking exists
+		if not tutorial_completed.has("stellar_grid"):
+			tutorial_completed["stellar_grid"] = false

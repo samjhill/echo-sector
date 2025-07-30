@@ -14,6 +14,11 @@ config/name="Echo Sector"
 run/main_scene="uid://dec0onipaltl0"
 config/features=PackedStringArray("4.4", "Mobile")
 config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.0784314, 0.0784314, 0.0784314, 1)
+boot_splash/image="res://assets/textures/echo-sector.png"
+boot_splash/image_color=Color(1, 1, 1, 1)
+boot_splash/fullsize=true
+boot_splash/use_filter=true
 
 [autoload]
 

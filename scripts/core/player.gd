@@ -331,6 +331,12 @@ func shoot_at_target(target: Node2D):
 
 func lock_on_target(target: Node2D):
 	print("Locking on target:", target.name)
+	
+	# Notify tutorial system about enemy tap
+	var game_tutorial = get_tree().get_first_node_in_group("game_tutorial")
+	if game_tutorial and game_tutorial.has_method("on_enemy_tapped"):
+		game_tutorial.on_enemy_tapped(target)
+	
 	if current_target == target:
 		# Already locked on, don't toggle off on second tap
 		print("Already locked on target:", target.name)

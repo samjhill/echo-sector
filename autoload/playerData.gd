@@ -156,7 +156,8 @@ func load_game():
 		
 		# Initialize tutorial completion tracking
 		tutorial_completed = {
-			"stellar_grid": false
+			"stellar_grid": false,
+			"game_tutorial": false
 		}
 		
 		# Initialize equipped components
@@ -360,10 +361,13 @@ func set_tutorial_completed(tutorial_name: String, completed: bool):
 	"""Set tutorial completion status"""
 	tutorial_completed[tutorial_name] = completed
 	save_game()
+	Logger.info("Tutorial completion set: %s = %s" % [tutorial_name, completed], "PlayerData")
 
 func get_tutorial_completed(tutorial_name: String, default_value: bool = false) -> bool:
 	"""Get tutorial completion status"""
-	return tutorial_completed.get(tutorial_name, default_value)
+	var result = tutorial_completed.get(tutorial_name, default_value)
+	Logger.info("Tutorial completion get: %s = %s" % [tutorial_name, result], "PlayerData")
+	return result
 
 func ensure_stellar_grid_starter_items():
 	"""Ensure that existing players have the Stellar Grid starter items"""
@@ -389,3 +393,5 @@ func ensure_stellar_grid_starter_items():
 		# Also ensure tutorial completion tracking exists
 		if not tutorial_completed.has("stellar_grid"):
 			tutorial_completed["stellar_grid"] = false
+		if not tutorial_completed.has("game_tutorial"):
+			tutorial_completed["game_tutorial"] = false

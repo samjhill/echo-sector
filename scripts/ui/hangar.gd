@@ -3,9 +3,11 @@ extends Control
 @onready var launch_button = $MainContainer/ActionSection/LaunchButton
 @onready var ship_loadout_button = $MainContainer/ActionSection/ShipLoadoutButton
 @onready var stellar_grid_button = $MainContainer/ActionSection/StellarGridButton
+@onready var settings_button = $MainContainer/ActionSection/SettingsButton
 @onready var drone_panel = $MainContainer/ComingSoonSection/DronePanel
 @onready var upgrade_panel = $MainContainer/ComingSoonSection/UpgradePanel
 @onready var ship_loadout_panel = $ShipEquipmentScreen
+@onready var settings_panel = $SettingsScreen
 var stellar_grid_panel: Control = null
 @onready var build_label = $MainContainer/TopSection/TopRight/BuildLabel
 @onready var credits_label = $MainContainer/TopSection/TopRight/CreditsLabel
@@ -19,6 +21,7 @@ func _ready():
 	launch_button.pressed.connect(_on_launch_button_pressed)
 	ship_loadout_button.pressed.connect(_on_ship_loadout_button_pressed)
 	stellar_grid_button.pressed.connect(_on_stellar_grid_button_pressed)
+	settings_button.pressed.connect(_on_settings_button_pressed)
 	
 	# Connect to PlayerData signals for dynamic updates
 	PlayerData.credits_changed.connect(_on_credits_changed)
@@ -107,6 +110,24 @@ func _on_stellar_grid_button_pressed():
 	stellar_grid_panel.modulate.a = 0.0
 	var tween = create_tween()
 	tween.tween_property(stellar_grid_panel, "modulate:a", 1.0, 0.3)
+
+func _on_settings_button_pressed():
+	"""Handle settings button press"""
+	Logger.info("Settings button pressed", "Hangar")
+	
+	if settings_panel == null:
+		Logger.error("Settings panel is null!", "Hangar")
+		return
+	
+	Logger.info("Settings panel found, making visible", "Hangar")
+	settings_panel.visible = true
+	
+	# Simple fade in for the settings screen
+	settings_panel.modulate.a = 0.0
+	var tween = create_tween()
+	tween.tween_property(settings_panel, "modulate:a", 1.0, 0.3)
+	
+	Logger.info("Settings panel visibility: %s" % settings_panel.visible, "Hangar")
 
 func _on_equipment_screen_closed():
 	ship_loadout_panel.visible = false

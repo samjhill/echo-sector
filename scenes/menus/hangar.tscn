@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dec0onipaltl0"]
+[gd_scene load_steps=8 format=3 uid="uid://dec0onipaltl0"]
 
 [ext_resource type="Script" uid="uid://dif6du4rnfthq" path="res://scripts/ui/hangar.gd" id="1_2d16u"]
 [ext_resource type="Texture2D" uid="uid://c3a3pnv8sv4gt" path="res://assets/textures/hangar.png" id="2_fpkqt"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://5u8fy74kqjg5" path="res://assets/textures/logo.png" id="4_34qk5"]
 [ext_resource type="AudioStream" uid="uid://003h3gk0kijo" path="res://music/echo-sector-hangar-screen.wav" id="5_afel3"]
 [ext_resource type="PackedScene" uid="uid://1mm73hyamymw" path="res://scenes/ui/ship_equipment_screen.tscn" id="6_g2g6c"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_screen.tscn" id="7_settings"]
 
 [node name="Hangar" type="Control"]
 layout_mode = 3
@@ -144,9 +145,24 @@ theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "STELLAR GRID"
 
+[node name="SettingsButton" type="Button" parent="MainContainer/ActionSection"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_colors/font_pressed_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 20
+text = "SETTINGS"
+
 [node name="ShipEquipmentScreen" parent="." instance=ExtResource("6_g2g6c")]
 visible = false
 layout_mode = 1
+
+[node name="SettingsScreen" parent="." instance=ExtResource("7_settings")]
+visible = false
+layout_mode = 1
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("5_afel3")

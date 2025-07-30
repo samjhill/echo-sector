@@ -1,0 +1,100 @@
+[gd_scene load_steps=2 format=3 uid="uid://bqxv8y7n8lam1"]
+
+[ext_resource type="Script" path="res://scripts/ui/settings_screen.gd" id="1_0x8y9"]
+
+[node name="SettingsScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_0x8y9")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.0784314, 0.0784314, 0.0784314, 1)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="Header" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BackButton" type="Button" parent="MainContainer/Header"]
+layout_mode = 2
+text = "← Back"
+custom_minimum_size = Vector2(80, 40)
+
+[node name="Spacer" type="Control" parent="MainContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TitleLabel" type="Label" parent="MainContainer/Header"]
+layout_mode = 2
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="Content" type="ScrollContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ContentVBox" type="VBoxContainer" parent="MainContainer/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GameSection" type="VBoxContainer" parent="MainContainer/Content/ContentVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="GameSectionLabel" type="Label" parent="MainContainer/Content/ContentVBox/GameSection"]
+layout_mode = 2
+text = "Game Settings"
+theme_override_font_sizes/font_size = 18
+
+[node name="ClearSaveButton" type="Button" parent="MainContainer/Content/ContentVBox/GameSection"]
+layout_mode = 2
+text = "Clear Save Data"
+custom_minimum_size = Vector2(0, 50)
+theme_override_colors/font_color = Color(1, 0.5, 0.5, 1)
+theme_override_colors/font_hover_color = Color(1, 0.7, 0.7, 1)
+
+[node name="ClearSaveDescription" type="Label" parent="MainContainer/Content/ContentVBox/GameSection"]
+layout_mode = 2
+text = "This will permanently delete all saved game data including inventory, credits, and grid layout."
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+autowrap_mode = 2
+
+[node name="Spacer1" type="Control" parent="MainContainer/Content/ContentVBox"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="InfoSection" type="VBoxContainer" parent="MainContainer/Content/ContentVBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InfoSectionLabel" type="Label" parent="MainContainer/Content/ContentVBox/InfoSection"]
+layout_mode = 2
+text = "Game Information"
+theme_override_font_sizes/font_size = 18
+
+[node name="VersionLabel" type="Label" parent="MainContainer/Content/ContentVBox/InfoSection"]
+layout_mode = 2
+text = "Version: 1.0.0"
+
+[node name="BuildLabel" type="Label" parent="MainContainer/Content/ContentVBox/InfoSection"]
+layout_mode = 2
+text = "Build: Development"
+
+[node name="Spacer2" type="Control" parent="MainContainer/Content/ContentVBox"]
+layout_mode = 2
+size_flags_vertical = 3 

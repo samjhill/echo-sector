@@ -26,7 +26,7 @@ Echo Sector includes a comprehensive automated testing framework to ensure code 
 
 ### Running Tests
 
-#### Method 1: Command Line
+#### Method 1: Command Line (Recommended)
 ```bash
 ./run_tests.sh
 ```
@@ -37,29 +37,45 @@ Echo Sector includes a comprehensive automated testing framework to ensure code 
 
 #### Method 3: Direct Script
 ```bash
-godot --headless --script res://tests/run_tests.gd
+godot --headless --script res://tests/comprehensive_test_runner.gd
 ```
 
 ### Test Coverage
 
-The testing framework covers:
+The comprehensive testing framework covers:
 
 - ✅ **Core Systems**: PlayerData, resource loading, equipment management
+- ✅ **Stellar Grid**: Grid management, item placement, production system
 - ✅ **UI Components**: Scene loading, path validation, button functionality  
 - ✅ **Error Handling**: Invalid resources, corrupted files, missing data
 - ✅ **Performance**: Large datasets, efficient operations
 - ✅ **Data Integrity**: Save/load, serialization, state management
+- ✅ **Logging**: Structured logging with different levels
+- ✅ **Mobile Support**: Touch input, long press, responsive design
 
 ### Test Structure
 
 ```
 tests/
-├── unit/                    # Unit tests for core systems
-├── ui/                      # UI integration tests
-├── test_runner.gd          # Main test orchestrator
-├── base_test_suite.gd      # Common testing utilities
-└── README.md              # Detailed testing documentation
+├── unit/                           # Unit tests for core systems
+│   ├── test_player_data.gd        # PlayerData autoload tests
+│   ├── test_resource_loading.gd   # Resource loading tests
+│   ├── test_equipment_system.gd   # Equipment system tests
+│   └── test_stellar_grid.gd       # Stellar Grid system tests
+├── ui/                             # UI integration tests
+│   └── test_ui_integration.gd     # UI and scene tests
+├── comprehensive_test_runner.gd    # Main comprehensive test runner
+├── base_test_suite.gd             # Common testing utilities
+└── README.md                      # Detailed testing documentation
 ```
+
+### Code Quality Features
+
+- 🔍 **Structured Logging**: Replaced debug prints with proper logging system
+- 🧹 **Code Cleanup**: Removed commented code and debug statements
+- 📝 **Documentation**: Added comprehensive docstrings
+- 🎯 **Best Practices**: Following Godot coding standards
+- 🧪 **Comprehensive Tests**: 50+ test cases covering all major systems
 
 For detailed testing documentation, see [tests/README.md](tests/README.md).
 

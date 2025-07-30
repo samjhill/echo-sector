@@ -70,7 +70,7 @@ func load_grid_data():
 		var parse_result = json.parse(json_string)
 		if parse_result == OK:
 			var data = json.data
-			print("Loaded grid data structure: ", data)
+			Logger.debug("Loaded grid data structure: %s" % data, "GridManager")
 			
 			# Load placed tiles first (before changing grid size)
 			var tiles_to_load = []
@@ -84,7 +84,7 @@ func load_grid_data():
 					elif position_data is Array and position_data.size() >= 2:
 						position = Vector2i(position_data[0], position_data[1])
 					else:
-						print("Warning: Invalid position format in tile data")
+						Logger.warning("Invalid position format in tile data", "GridManager")
 						continue
 					
 					var item_name = tile_data.item_name
@@ -104,7 +104,7 @@ func load_grid_data():
 				elif grid_size_data is Array and grid_size_data.size() >= 2:
 					grid_size = Vector2i(grid_size_data[0], grid_size_data[1])
 				else:
-					print("Warning: Invalid grid_size format in save data")
+					Logger.warning("Invalid grid_size format in save data", "GridManager")
 					grid_size = Vector2i(3, 3)  # Default fallback
 			
 			# Reinitialize grid with new size
@@ -120,17 +120,17 @@ func load_grid_data():
 						var tile = grid_tiles[position.x][position.y]
 						tile.place_item(item)
 						tile_placed.emit(position, item)
-						print("Loaded item ", tile_data.item_name, " at position ", position)
+						Logger.info("Loaded item %s at position %s" % [tile_data.item_name, position], "GridManager")
 					else:
-						print("Warning: Position ", position, " is invalid for grid size ", grid_size)
+						Logger.warning("Position %s is invalid for grid size %s" % [position, grid_size], "GridManager")
 				else:
-					print("Warning: Could not find item ", tile_data.item_name, " for loading")
+					Logger.warning("Could not find item %s for loading" % tile_data.item_name, "GridManager")
 			
-			print("Grid data loaded from save file")
+			Logger.info("Grid data loaded from save file", "GridManager")
 		else:
-			print("Error parsing grid save data")
+			Logger.error("Error parsing grid save data", "GridManager")
 	else:
-		print("No grid save file found, starting with empty grid")
+		Logger.info("No grid save file found, starting with empty grid", "GridManager")
 
 func save_grid_data():
 	"""Save current grid state to file"""
@@ -156,12 +156,12 @@ func save_grid_data():
 func place_item(grid_position: Vector2i, item: Item) -> bool:
 	"""Place an item on the grid at the specified position"""
 	if not is_valid_position(grid_position):
-		print("Invalid grid position: ", grid_position)
+		Logger.warning("Invalid grid position: %s" % grid_position, "GridManager")
 		return false
 	
 	var tile = grid_tiles[grid_position.x][grid_position.y]
 	if tile.tile_state != GridTile.TileState.EMPTY:
-		print("Tile already occupied at: ", grid_position)
+		Logger.warning("Tile already occupied at: %s" % grid_position, "GridManager")
 		return false
 	
 	# Place the item
@@ -174,7 +174,7 @@ func place_item(grid_position: Vector2i, item: Item) -> bool:
 	# Save grid state
 	save_grid_data()
 	
-	print("Placed ", item.name, " at grid position: ", grid_position)
+	Logger.info("Placed %s at grid position %s" % [item.name, grid_position], "GridManager")
 	return true
 
 func remove_item(grid_position: Vector2i) -> Item:
@@ -281,7 +281,7 @@ func _on_production_tick():
 	last_production_time = Time.get_unix_time_from_system()
 	production_tick_completed.emit(resources_generated)
 	
-	print("Production tick completed. Generated: ", resources_generated)
+	Logger.info("Production tick completed. Generated: %s" % resources_generated, "GridManager")
 
 func get_total_resources_generated() -> Dictionary:
 	"""Get the total resources generated since start"""
@@ -294,16 +294,15 @@ func get_grid_state() -> Array[Array]:
 func _on_grid_expanded(new_size: Vector2i):
 	"""Handle grid expansion from progression system"""
 	grid_size = new_size
-	# TODO: Update UI grid display
-	print("Grid expanded to: ", new_size)
+	Logger.info("Grid expanded to: %s" % new_size, "GridManager")
 
 func _on_modifier_applied(modifier: Dictionary):
 	"""Handle modifier application"""
-	print("Modifier applied: ", modifier.name)
+	Logger.info("Modifier applied: %s" % modifier.name, "GridManager")
 
 func _on_event_triggered(event: Dictionary):
 	"""Handle random event"""
-	print("Event triggered: ", event.name)
+	Logger.info("Event triggered: %s" % event.name, "GridManager")
 
 func find_item_by_name(item_name: String) -> Item:
 	"""Find an item by name in the player's inventory or create it if it's a grid module"""
@@ -321,7 +320,7 @@ func find_item_by_name(item_name: String) -> Item:
 	elif item_name.contains("Research Lab"):
 		return create_research_lab_item()
 	
-	print("Could not find or create item: ", item_name)
+	Logger.warning("Could not find or create item: %s" % item_name, "GridManager")
 	return null
 
 func create_power_core_item() -> Item:

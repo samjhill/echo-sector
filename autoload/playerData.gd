@@ -26,10 +26,11 @@ func save_game():
 				"icon_path": item.icon_path,
 				"slot_type": item.slot_type,
 				"stats": item.stats,
-				"resource_path": "res://scripts/core/item.gd"  # Default resource path
+				"resource_path": "res://scripts/core/item.gd"
 			})
 		else:
-			print("Warning: Found null item in inventory during save")
+			Logger.warning("Found null item in inventory during save", "PlayerData")
+	
 	var serialized_equipment = {}
 	for slot in equipped_components:
 		var items = equipped_components[slot]
@@ -43,10 +44,10 @@ func save_game():
 						"icon_path": item.icon_path,
 						"slot_type": item.slot_type,
 						"stats": item.stats,
-						"resource_path": "res://scripts/core/item.gd"  # Default resource path
+						"resource_path": "res://scripts/core/item.gd"
 					})
 				else:
-					print("Warning: Found null item in equipped_components[", slot, "] during save")
+					Logger.warning("Found null item in equipped_components[%s] during save" % slot, "PlayerData")
 		else:
 			# Backward compatibility: single item
 			if items != null:
@@ -56,10 +57,11 @@ func save_game():
 					"icon_path": items.icon_path,
 					"slot_type": items.slot_type,
 					"stats": items.stats,
-					"resource_path": "res://scripts/core/item.gd"  # Default resource path
+					"resource_path": "res://scripts/core/item.gd"
 				}]
 			else:
-				print("Warning: Found null item in equipped_components[", slot, "] during save")
+				Logger.warning("Found null item in equipped_components[%s] during save" % slot, "PlayerData")
+	
 	var data = {
 		"credits": credits,
 		"scrap": scrap,
@@ -72,12 +74,12 @@ func save_game():
 
 func load_game():
 	if not FileAccess.file_exists(SAVE_FILE_PATH):
-		print("No save file found.")
+		Logger.info("No save file found, creating new game", "PlayerData")
 		# Start with basic equipment and resources
 		inventory.clear()
 		equipped_components.clear()
-		credits = 50  # Starting credits
-		scrap = 25    # Starting scrap
+		credits = 50
+		scrap = 25
 		
 		# Create starter items
 		var starter_items = [
@@ -174,9 +176,9 @@ func load_game():
 			if item.icon_path != "":
 				item.icon = load(item.icon_path)
 			inventory.append(item)
-			print("Added starter grid item: ", item.name, " (type: ", item.type, ", slot_type: ", item.slot_type, ")")
+			Logger.info("Added starter grid item: %s (type: %s, slot_type: %s)" % [item.name, item.type, item.slot_type], "PlayerData")
 		
-		print("Total inventory items after adding grid items: ", inventory.size())
+		Logger.info("Total inventory items after adding grid items: %d" % inventory.size(), "PlayerData")
 		
 		# Initialize tutorial completion tracking
 		tutorial_completed = {
@@ -188,9 +190,9 @@ func load_game():
 		equipped_components["engine"] = []
 		
 		save_game()
-		print("Created new save file with starter items.")
+		Logger.info("Created new save file with starter items", "PlayerData")
 	else:
-		print("Loading existing save file...")
+		Logger.info("Loading existing save file", "PlayerData")
 		var file = FileAccess.open(SAVE_FILE_PATH, FileAccess.READ)
 		var json_string = file.get_as_text()
 		file.close()
@@ -232,13 +234,13 @@ func load_game():
 					var item_resource
 					if slot == "weapon" and (resource_path == "res://components/laserWeapon.gd" or item_data.get("name", "").contains("Laser")):
 						item_resource = load("res://components/laserWeapon.gd")
-						if item_resource == null:
-							print("WARNING: Failed to load laserWeapon.gd, falling back to Item")
-							item_resource = load("res://scripts/core/item.gd")
+					if item_resource == null:
+						Logger.warning("Failed to load laserWeapon.gd, falling back to Item", "PlayerData")
+						item_resource = load("res://scripts/core/item.gd")
 					elif slot == "weapon" and item_data.get("name", "").contains("Railgun"):
 						item_resource = load("res://components/railgunWeapon.gd")
 						if item_resource == null:
-							print("WARNING: Failed to load railgunWeapon.gd, falling back to Item")
+							Logger.warning("Failed to load railgunWeapon.gd, falling back to Item", "PlayerData")
 							item_resource = load("res://scripts/core/item.gd")
 					elif slot == "engine":
 						# For engine components, try to load the specific engine resource
@@ -251,15 +253,15 @@ func load_game():
 						else:
 							item_resource = load(resource_path)
 						if item_resource == null:
-							print("WARNING: Failed to load engine component, falling back to Item")
+							Logger.warning("Failed to load engine component, falling back to Item", "PlayerData")
 							item_resource = load("res://scripts/core/item.gd")
 					else:
 						item_resource = load(resource_path)
 					
 					# Check if resource loaded successfully
 					if item_resource == null:
-						print("ERROR: Failed to load resource: ", resource_path)
-						print("Item data: ", item_data)
+						Logger.error("Failed to load resource: %s" % resource_path, "PlayerData")
+						Logger.debug("Item data: %s" % item_data, "PlayerData")
 						continue
 					
 					var equipped_item
@@ -290,13 +292,13 @@ func load_game():
 	cleanup_null_items()
 
 func cleanup_null_items():
-	# Remove null items from inventory
+	"""Remove null items from inventory and equipped components"""
 	var cleaned_inventory = []
 	for item in inventory:
 		if item != null:
 			cleaned_inventory.append(item)
 		else:
-			print("Removing null item from inventory")
+			Logger.warning("Removing null item from inventory", "PlayerData")
 	inventory = cleaned_inventory
 	
 	# Remove null items from equipped components
@@ -308,12 +310,12 @@ func cleanup_null_items():
 				if item != null:
 					cleaned_items.append(item)
 				else:
-					print("Removing null item from equipped_components[", slot, "]")
+					Logger.warning("Removing null item from equipped_components[%s]" % slot, "PlayerData")
 			equipped_components[slot] = cleaned_items
 		else:
 			# Backward compatibility: single item
 			if items == null:
-				print("Removing null item from equipped_components[", slot, "]")
+				Logger.warning("Removing null item from equipped_components[%s]" % slot, "PlayerData")
 				equipped_components.erase(slot)
 
 func get_equipped_weapons() -> Array:
@@ -323,16 +325,18 @@ func get_equipped_engines() -> Array:
 	return equipped_components["engine"] if equipped_components.has("engine") else []
 
 func add_scrap(amount: int):
+	"""Add scrap to player's total"""
 	scrap += amount
 	scrap_changed.emit(scrap)
 	save_game()
-	print("Added", amount, "scrap. Total:", scrap)
+	Logger.info("Added %d scrap. Total: %d" % [amount, scrap], "PlayerData")
 
 func add_credits(amount: int):
+	"""Add credits to player's total"""
 	credits += amount
 	credits_changed.emit(credits)
 	save_game()
-	print("Added", amount, "credits. Total:", credits)
+	Logger.info("Added %d credits. Total: %d" % [amount, credits], "PlayerData")
 
 func add_item_to_inventory(item: Item):
 	"""Add an item to the player's inventory"""
@@ -340,7 +344,9 @@ func add_item_to_inventory(item: Item):
 		inventory.append(item)
 		inventory_changed.emit()
 		save_game()
-		print("Added", item.name, "to inventory")
+		Logger.info("Added %s to inventory" % item.name, "PlayerData")
+	else:
+		Logger.error("Attempted to add null item to inventory", "PlayerData")
 
 func remove_item_from_inventory(item: Item):
 	"""Remove an item from the player's inventory"""
@@ -350,9 +356,11 @@ func remove_item_from_inventory(item: Item):
 			inventory.remove_at(index)
 			inventory_changed.emit()
 			save_game()
-			print("Removed", item.name, "from inventory")
+			Logger.info("Removed %s from inventory" % item.name, "PlayerData")
 		else:
-			print("Item not found in inventory:", item.name)
+			Logger.warning("Item not found in inventory: %s" % item.name, "PlayerData")
+	else:
+		Logger.error("Attempted to remove null item from inventory", "PlayerData")
 
 func get_inventory_items() -> Array[Item]:
 	"""Get all items in the inventory"""

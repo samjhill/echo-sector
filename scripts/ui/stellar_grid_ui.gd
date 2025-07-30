@@ -36,11 +36,11 @@ func _ready():
 	grid_info_label = $MainContainer/Content/TopRow/InfoSection/GridInfoLabel
 	close_button = $MainContainer/Header/CloseButton
 	
-	print("Grid container found: ", grid_container != null)
-	print("Inventory panel found: ", inventory_panel != null)
-	print("Production display found: ", production_display != null)
-	print("Grid info label found: ", grid_info_label != null)
-	print("Close button found: ", close_button != null)
+	Logger.debug("Grid container found: %s" % (grid_container != null), "StellarGridUI")
+	Logger.debug("Inventory panel found: %s" % (inventory_panel != null), "StellarGridUI")
+	Logger.debug("Production display found: %s" % (production_display != null), "StellarGridUI")
+	Logger.debug("Grid info label found: %s" % (grid_info_label != null), "StellarGridUI")
+	Logger.debug("Close button found: %s" % (close_button != null), "StellarGridUI")
 	
 	setup_grid_manager()
 	create_grid_ui()
@@ -52,7 +52,7 @@ func _ready():
 	if not PlayerData.get_tutorial_completed("stellar_grid", false):
 		start_tutorial()
 	else:
-		print("Tutorial already completed, skipping...")
+		Logger.info("Tutorial already completed, skipping", "StellarGridUI")
 
 func setup_grid_manager():
 	"""Initialize the grid manager"""
@@ -145,12 +145,12 @@ func setup_long_press_system():
 
 func update_inventory_display():
 	"""Update the inventory display with grid-compatible items"""
-	# Debug: check if inventory panel exists
+	# Check if inventory panel exists
 	if inventory_panel == null:
-		print("ERROR: inventory_panel is null!")
+		Logger.error("Inventory panel is null", "StellarGridUI")
 		return
 	
-	print("Inventory panel found: ", inventory_panel.name)
+	Logger.debug("Inventory panel found: %s" % inventory_panel.name, "StellarGridUI")
 	
 	# Clear existing inventory display
 	var inventory_vbox = inventory_panel.get_node("InventoryScroll/InventoryVBox")
@@ -161,57 +161,57 @@ func update_inventory_display():
 		
 		# Create inventory items display
 		var grid_items = get_grid_compatible_items()
-		print("Found ", grid_items.size(), " grid-compatible items in inventory")
+		Logger.info("Found %d grid-compatible items in inventory" % grid_items.size(), "StellarGridUI")
 		for item in grid_items:
-			print("  - ", item.name, " (", item.type, ")")
+			Logger.debug("  - %s (%s)" % [item.name, item.type], "StellarGridUI")
 			var item_button = create_inventory_item_button(item)
 			inventory_vbox.add_child(item_button)
 	else:
-		print("ERROR: Could not find InventoryVBox in inventory panel")
+		Logger.error("Could not find InventoryVBox in inventory panel", "StellarGridUI")
 		# Try alternative path
 		inventory_vbox = inventory_panel.get_node("InventoryScroll/InventoryVBox")
 		if inventory_vbox != null:
-			print("Found inventory vbox with alternative path")
+			Logger.debug("Found inventory vbox with alternative path", "StellarGridUI")
 			for child in inventory_vbox.get_children():
 				if child.has_method("queue_free"):
 					child.queue_free()
 			
 			var grid_items = get_grid_compatible_items()
-			print("Found ", grid_items.size(), " grid-compatible items in inventory")
+			Logger.info("Found %d grid-compatible items in inventory" % grid_items.size(), "StellarGridUI")
 			for item in grid_items:
-				print("  - ", item.name, " (", item.type, ")")
+				Logger.debug("  - %s (%s)" % [item.name, item.type], "StellarGridUI")
 				var item_button = create_inventory_item_button(item)
 				inventory_vbox.add_child(item_button)
 		else:
-			print("ERROR: Could not find InventoryVBox with any path")
+			Logger.error("Could not find InventoryVBox with any path", "StellarGridUI")
 			# Debug: print the actual structure
-			print("Inventory panel children:")
+			Logger.debug("Inventory panel children:", "StellarGridUI")
 			for child in inventory_panel.get_children():
-				print("  - ", child.name, " (", child.get_class(), ")")
+				Logger.debug("  - %s (%s)" % [child.name, child.get_class()], "StellarGridUI")
 				if child.name == "InventoryScroll":
-					print("    InventoryScroll children:")
+					Logger.debug("    InventoryScroll children:", "StellarGridUI")
 					for grandchild in child.get_children():
-						print("      - ", grandchild.name, " (", grandchild.get_class(), ")")
+						Logger.debug("      - %s (%s)" % [grandchild.name, grandchild.get_class()], "StellarGridUI")
 
 func get_grid_compatible_items() -> Array[Item]:
 	"""Get items from inventory that can be placed on the grid"""
 	var compatible_items: Array[Item] = []
 	
-	print("Checking inventory for grid-compatible items...")
-	print("Total inventory items: ", PlayerData.inventory.size())
+	Logger.debug("Checking inventory for grid-compatible items", "StellarGridUI")
+	Logger.debug("Total inventory items: %d" % PlayerData.inventory.size(), "StellarGridUI")
 	
 	# Debug: print all inventory items
 	for i in range(PlayerData.inventory.size()):
 		var item = PlayerData.inventory[i]
 		if item != null:
-			print("  Item ", i, ": ", item.name, " (type: ", item.type, ", slot_type: ", item.slot_type, ")")
+			Logger.debug("  Item %d: %s (type: %s, slot_type: %s)" % [i, item.name, item.type, item.slot_type], "StellarGridUI")
 			if item.type == "grid_module":
 				compatible_items.append(item)
-				print("    -> Added to grid-compatible items")
+				Logger.debug("    -> Added to grid-compatible items", "StellarGridUI")
 		else:
-			print("  Item ", i, ": null")
+			Logger.debug("  Item %d: null" % i, "StellarGridUI")
 	
-	print("Total grid-compatible items: ", compatible_items.size())
+	Logger.debug("Total grid-compatible items: %d" % compatible_items.size(), "StellarGridUI")
 	return compatible_items
 
 func create_inventory_item_button(item: Item) -> Button:
@@ -238,14 +238,14 @@ func _on_tile_button_pressed(grid_position: Vector2i):
 			update_grid_display()
 			update_inventory_display()
 		else:
-			print("Failed to place item at: ", grid_position)
+			Logger.warning("Failed to place item at: %s" % grid_position, "StellarGridUI")
 	elif grid_manager.get_tile(grid_position) != null and grid_manager.get_tile(grid_position).is_occupied():
 		# Show info about the placed item
 		var tile = grid_manager.get_tile(grid_position)
 		var item = tile.get_item()
-		print("Tile at ", grid_position, " contains: ", item.name)
+		Logger.info("Tile at %s contains: %s" % [grid_position, item.name], "StellarGridUI")
 	else:
-		print("No item selected and tile is empty")
+		Logger.debug("No item selected and tile is empty", "StellarGridUI")
 
 func _on_tile_gui_input(event: InputEvent, grid_position: Vector2i):
 	"""Handle mobile-friendly input for tile interaction"""
@@ -291,16 +291,16 @@ func remove_item_from_tile(grid_position: Vector2i):
 	if tile != null and tile.is_occupied():
 		var removed_item = grid_manager.remove_item(grid_position)
 		if removed_item != null:
-			print("Removed ", removed_item.name, " from position ", grid_position)
+			Logger.info("Removed %s from position %s" % [removed_item.name, grid_position], "StellarGridUI")
 			# Add item back to inventory
 			PlayerData.add_item_to_inventory(removed_item)
 			update_grid_display()
 			update_inventory_display()
 			show_removal_feedback(grid_position)
 		else:
-			print("Failed to remove item from position ", grid_position)
+			Logger.warning("Failed to remove item from position %s" % grid_position, "StellarGridUI")
 	else:
-		print("No item to remove at position ", grid_position)
+		Logger.debug("No item to remove at position %s" % grid_position, "StellarGridUI")
 
 func show_removal_feedback(grid_position: Vector2i):
 	"""Show visual feedback for item removal"""
@@ -363,7 +363,7 @@ func _on_tile_unhovered(grid_position: Vector2i):
 func _on_inventory_item_selected(item: Item):
 	"""Handle inventory item selection"""
 	selected_item = item
-	print("Selected item for placement: ", item.name)
+	Logger.info("Selected item for placement: %s" % item.name, "StellarGridUI")
 
 func _on_production_tick(resources_generated: Dictionary):
 	"""Handle production tick completion"""
@@ -391,7 +391,7 @@ func update_tile_display(grid_position: Vector2i):
 	
 	# Check if grid_tile_buttons array is valid for this position
 	if grid_position.x >= grid_tile_buttons.size() or grid_position.y >= grid_tile_buttons[0].size():
-		print("Warning: Grid position ", grid_position, " is out of bounds for UI buttons")
+		Logger.warning("Grid position %s is out of bounds for UI buttons" % grid_position, "StellarGridUI")
 		return
 	
 	var button = grid_tile_buttons[grid_position.x][grid_position.y]

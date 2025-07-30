@@ -1,0 +1,123 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8x7y2z9w4v5u6"]
+
+[ext_resource type="Script" path="res://scripts/ui/stellar_grid_ui.gd" id="1_0x1y2"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1"]
+font_size = 24
+font_color = Color(1, 1, 1, 1)
+
+[node name="StellarGridScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_0x1y2")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.1, 0.1, 0.15, 1)
+
+[node name="MainContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+
+[node name="Header" type="HBoxContainer" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MainContainer/Header"]
+layout_mode = 2
+text = "Stellar Grid"
+label_settings = SubResource("LabelSettings_1")
+
+[node name="CloseButton" type="Button" parent="MainContainer/Header"]
+layout_mode = 2
+size_flags_horizontal = 8
+text = "Close"
+
+[node name="HSeparator" type="HSeparator" parent="MainContainer"]
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="MainContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+
+[node name="TopRow" type="HBoxContainer" parent="MainContainer/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="GridSection" type="VBoxContainer" parent="MainContainer/Content/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="GridLabel" type="Label" parent="MainContainer/Content/TopRow/GridSection"]
+layout_mode = 2
+text = "Grid Modules"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="GridContainer" type="GridContainer" parent="MainContainer/Content/TopRow/GridSection"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+columns = 5
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="InfoSection" type="VBoxContainer" parent="MainContainer/Content/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="GridInfoLabel" type="Label" parent="MainContainer/Content/TopRow/InfoSection"]
+layout_mode = 2
+text = "Grid Status:
+Occupied: 0/25
+Efficiency: 0%"
+theme_override_font_sizes/font_size = 14
+
+[node name="ProductionDisplay" type="Label" parent="MainContainer/Content/TopRow/InfoSection"]
+layout_mode = 2
+text = "Last Production Tick:
+No resources generated"
+theme_override_font_sizes/font_size = 14
+
+[node name="HSeparator2" type="HSeparator" parent="MainContainer/Content"]
+layout_mode = 2
+
+[node name="InventorySection" type="VBoxContainer" parent="MainContainer/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InventoryLabel" type="Label" parent="MainContainer/Content/InventorySection"]
+layout_mode = 2
+text = "Available Modules"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="InventoryPanel" type="Panel" parent="MainContainer/Content/InventorySection"]
+layout_mode = 2
+size_flags_vertical = 3
+custom_minimum_size = Vector2(0, 120)
+
+[node name="InventoryScroll" type="ScrollContainer" parent="MainContainer/Content/InventorySection/InventoryPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="InventoryVBox" type="VBoxContainer" parent="MainContainer/Content/InventorySection/InventoryPanel/InventoryScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 5 

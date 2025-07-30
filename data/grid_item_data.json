@@ -1,0 +1,153 @@
+{
+	"grid_items": {
+		"power_core_mk1": {
+			"name": "Power Core Mk I",
+			"description": "Basic power generation module. Provides energy to adjacent modules.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/plasma-core.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"credits": 2
+				},
+				"adjacency_bonus": {
+					"type": "power",
+					"bonus": 0.2
+				}
+			},
+			"effects": []
+		},
+		"extractor_mk1": {
+			"name": "Extractor Mk I",
+			"description": "Processes raw materials into scrap metal. Benefits from power adjacency.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/uranium.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"scrap": 3
+				}
+			},
+			"effects": []
+		},
+		"research_lab_mk1": {
+			"name": "Research Lab Mk I",
+			"description": "Generates research points and blueprint fragments for technology development.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/portal.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"research_points": 1,
+					"blueprint_fragments": 1
+				}
+			},
+			"effects": []
+		},
+		"refinery_mk1": {
+			"name": "Refinery Mk I",
+			"description": "Processes raw materials into scrap metal.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/uranium.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"scrap": 3
+				}
+			},
+			"effects": []
+		},
+		"research_lab_mk1": {
+			"name": "Research Lab Mk I",
+			"description": "Generates research points for blueprint development.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/portal.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"research_points": 1
+				},
+				"adjacency_bonus": {
+					"type": "research",
+					"bonus": 0.15
+				}
+			},
+			"effects": []
+		},
+		"drone_fabricator_mk1": {
+			"name": "Drone Fabricator Mk I",
+			"description": "Automated unit production facility.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/ship.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"discovery_points": 1
+				}
+			},
+			"effects": []
+		},
+		"advanced_power_core": {
+			"name": "Advanced Power Core",
+			"description": "High-efficiency power generation with enhanced adjacency bonuses.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/plasma-core.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"credits": 5
+				},
+				"adjacency_bonus": {
+					"type": "power",
+					"bonus": 0.3
+				}
+			},
+			"effects": []
+		},
+		"quantum_refinery": {
+			"name": "Quantum Refinery",
+			"description": "Advanced material processing with high scrap output.",
+			"type": "grid_module",
+			"slot_type": "grid_module",
+			"icon_path": "res://assets/textures/uranium.png",
+			"resource_path": "res://scripts/core/item.gd",
+			"is_equippable": false,
+			"is_stackable": false,
+			"max_stack": 1,
+			"stats": {
+				"production": {
+					"scrap": 8
+				}
+			},
+			"effects": []
+		}
+	}
+} 

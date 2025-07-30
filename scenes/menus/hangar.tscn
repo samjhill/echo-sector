@@ -135,6 +135,15 @@ theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 28
 text = "SHIP LOADOUT"
 
+[node name="StellarGridButton" type="Button" parent="MainContainer/ActionSection"]
+custom_minimum_size = Vector2(0, 100)
+layout_mode = 2
+theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 28
+text = "STELLAR GRID"
+
 [node name="ShipEquipmentScreen" parent="." instance=ExtResource("6_g2g6c")]
 visible = false
 layout_mode = 1

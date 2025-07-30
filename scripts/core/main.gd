@@ -9,7 +9,13 @@ var scrap_earned_this_run := 0
 # Tutorial system
 var game_tutorial: GameTutorial = null
 
+# Error display system
+var error_display: ErrorDisplay = null
+
 func _ready():
+	# Setup error display
+	setup_error_display()
+	
 	# Setup tutorial system
 	setup_tutorial()
 	
@@ -41,6 +47,11 @@ func setup_tutorial():
 		Logger.info("Game tutorial setup complete", "Main")
 	else:
 		Logger.info("Game tutorial already completed", "Main")
+
+func setup_error_display():
+	"""Setup the error display system"""
+	error_display = ErrorDisplay.new()
+	add_child(error_display)
 
 func _on_tutorial_completed_and_start_spawning():
 	"""Handle tutorial completion and start enemy spawning"""

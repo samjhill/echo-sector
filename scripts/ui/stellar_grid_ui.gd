@@ -3,6 +3,9 @@
 extends Control
 class_name StellarGridUI
 
+# Error display system
+var error_display: ErrorDisplay = null
+
 # Grid properties
 var grid_size: Vector2i = Vector2i(3, 3)
 var grid_manager: GridManager = null
@@ -27,6 +30,9 @@ var is_long_pressing: bool = false
 
 func _ready():
 	Logger.info("Initializing Stellar Grid UI", "StellarGridUI")
+	
+	# Setup error display
+	setup_error_display()
 	
 	# Initialize buff visual manager
 	buff_visual_manager = BuffVisualManager.new()
@@ -70,6 +76,11 @@ func setup_grid_manager():
 	# Setup UI after grid manager is ready
 	await get_tree().process_frame
 	refresh_grid_ui()
+
+func setup_error_display():
+	"""Setup the error display system"""
+	error_display = ErrorDisplay.new()
+	add_child(error_display)
 
 func setup_long_press_system():
 	"""Setup long press timer for mobile-friendly item removal"""
@@ -330,6 +341,22 @@ func create_inventory_item_button(item: Item) -> Button:
 
 func _on_tile_button_pressed(grid_position: Vector2i):
 	"""Handle tile button press for item placement"""
+	# Safety check for grid position bounds
+	if grid_position.x < 0 or grid_position.x >= grid_size.x or grid_position.y < 0 or grid_position.y >= grid_size.y:
+		var error_msg = "Invalid grid position for tile button press: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	# Safety check for grid manager
+	if not grid_manager:
+		var error_msg = "Grid manager is null"
+		Logger.error(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_error(error_msg)
+		return
+	
 	if selected_item != null:
 		if grid_manager.place_item(grid_position, selected_item):
 			# Remove the item from inventory when successfully placed
@@ -338,7 +365,10 @@ func _on_tile_button_pressed(grid_position: Vector2i):
 			update_grid_display()
 			update_inventory_display()
 		else:
-			Logger.warning("Failed to place item at: %s" % grid_position, "StellarGridUI")
+			var error_msg = "Failed to place item at: %s" % grid_position
+			Logger.warning(error_msg, "StellarGridUI")
+			if error_display:
+				error_display.show_warning(error_msg)
 	elif grid_manager.get_tile(grid_position) != null and grid_manager.get_tile(grid_position).is_occupied():
 		# Show info about the placed item
 		var tile = grid_manager.get_tile(grid_position)
@@ -354,6 +384,14 @@ func _on_tile_button_pressed(grid_position: Vector2i):
 
 func _on_tile_gui_input(event: InputEvent, grid_position: Vector2i):
 	"""Handle mobile-friendly input for tile interaction"""
+	# Safety check for grid position bounds
+	if grid_position.x < 0 or grid_position.x >= grid_size.x or grid_position.y < 0 or grid_position.y >= grid_size.y:
+		var error_msg = "Invalid grid position: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
 	if event is InputEventScreenTouch:
 		var touch_event = event as InputEventScreenTouch
 		if touch_event.pressed:
@@ -392,6 +430,22 @@ func _on_long_press_timeout():
 
 func remove_item_from_tile(grid_position: Vector2i):
 	"""Remove item from a grid tile"""
+	# Safety check for grid position bounds
+	if grid_position.x < 0 or grid_position.x >= grid_size.x or grid_position.y < 0 or grid_position.y >= grid_size.y:
+		var error_msg = "Invalid grid position for item removal: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	# Safety check for grid manager
+	if not grid_manager:
+		var error_msg = "Grid manager is null for item removal"
+		Logger.error(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_error(error_msg)
+		return
+	
 	var tile = grid_manager.get_tile(grid_position)
 	if tile != null and tile.is_occupied():
 		var removed_item = grid_manager.remove_item(grid_position)
@@ -402,12 +456,39 @@ func remove_item_from_tile(grid_position: Vector2i):
 			update_inventory_display()
 			show_removal_feedback(grid_position)
 		else:
-			Logger.warning("Failed to remove item from position %s" % grid_position, "StellarGridUI")
+			var error_msg = "Failed to remove item from position %s" % grid_position
+			Logger.warning(error_msg, "StellarGridUI")
+			if error_display:
+				error_display.show_warning(error_msg)
 	else:
 		Logger.debug("No item to remove at position %s" % grid_position, "StellarGridUI")
 
 func show_removal_feedback(grid_position: Vector2i):
 	"""Show visual feedback for item removal"""
+	# Safety check for grid position bounds
+	if grid_position.x < 0 or grid_position.x >= grid_size.x or grid_position.y < 0 or grid_position.y >= grid_size.y:
+		var error_msg = "Invalid grid position for removal feedback: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	# Safety check for grid_tile_buttons array
+	if grid_tile_buttons.size() <= grid_position.x or grid_tile_buttons[grid_position.x].size() <= grid_position.y:
+		var error_msg = "Grid tile buttons array bounds exceeded: %s, array size: %s" % [grid_position, grid_tile_buttons.size()]
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	var tile_button = grid_tile_buttons[grid_position.x][grid_position.y]
+	if not tile_button:
+		var error_msg = "Tile button is null at position: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
 	# Create a temporary visual feedback
 	var feedback = ColorRect.new()
 	feedback.color = Color.RED
@@ -415,7 +496,6 @@ func show_removal_feedback(grid_position: Vector2i):
 	feedback.anchor_right = 1.0
 	feedback.anchor_bottom = 1.0
 	
-	var tile_button = grid_tile_buttons[grid_position.x][grid_position.y]
 	tile_button.add_child(feedback)
 	
 	# Animate the feedback
@@ -425,8 +505,28 @@ func show_removal_feedback(grid_position: Vector2i):
 
 func show_long_press_indicator(grid_position: Vector2i, show: bool):
 	"""Show/hide visual indicator for long press"""
+	# Safety check for grid position bounds
+	if grid_position.x < 0 or grid_position.x >= grid_size.x or grid_position.y < 0 or grid_position.y >= grid_size.y:
+		var error_msg = "Invalid grid position for long press indicator: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	# Safety check for grid_tile_buttons array
+	if grid_tile_buttons.size() <= grid_position.x or grid_tile_buttons[grid_position.x].size() <= grid_position.y:
+		var error_msg = "Grid tile buttons array bounds exceeded for long press: %s, array size: %s" % [grid_position, grid_tile_buttons.size()]
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
 	var tile_button = grid_tile_buttons[grid_position.x][grid_position.y]
 	if tile_button == null:
+		var error_msg = "Tile button is null for long press indicator at position: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
 		return
 	
 	# Remove existing indicator

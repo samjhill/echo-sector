@@ -18,6 +18,12 @@ var grid_tile_buttons: Array[Array] = []
 var selected_item: Item = null
 var drag_preview: TextureRect
 
+# Mobile-friendly removal system
+var long_press_timer: Timer
+var long_press_duration: float = 0.8  # 800ms for long press
+var pressed_tile: Vector2i = Vector2i(-1, -1)
+var is_long_pressing: bool = false
+
 # Grid configuration
 var grid_size: Vector2i = Vector2i(3, 3)  # Start with 3x3
 const TILE_SIZE := 60
@@ -40,6 +46,7 @@ func _ready():
 	create_grid_ui()
 	setup_inventory_display()
 	connect_signals()
+	setup_long_press_system()
 	
 	# Check if tutorial should be shown
 	if not PlayerData.get_tutorial_completed("stellar_grid", false):
@@ -86,10 +93,9 @@ func create_tile_button(grid_position: Vector2i) -> Button:
 	button.add_theme_color_override("font_color", Color.WHITE)
 	button.add_theme_color_override("font_hover_color", Color.YELLOW)
 	
-	# Connect signals
+	# Connect signals for mobile-friendly interaction
 	button.pressed.connect(_on_tile_button_pressed.bind(grid_position))
-	button.mouse_entered.connect(_on_tile_hovered.bind(grid_position))
-	button.mouse_exited.connect(_on_tile_unhovered.bind(grid_position))
+	button.gui_input.connect(_on_tile_gui_input.bind(grid_position))
 	
 	return button
 
@@ -106,6 +112,14 @@ func connect_signals():
 	# Connect close button
 	if close_button != null:
 		close_button.pressed.connect(_on_close_button_pressed)
+
+func setup_long_press_system():
+	"""Setup the long press timer for mobile-friendly removal"""
+	long_press_timer = Timer.new()
+	long_press_timer.wait_time = long_press_duration
+	long_press_timer.one_shot = true
+	long_press_timer.timeout.connect(_on_long_press_timeout)
+	add_child(long_press_timer)
 
 func update_inventory_display():
 	"""Update the inventory display with grid-compatible items"""
@@ -203,6 +217,112 @@ func _on_tile_button_pressed(grid_position: Vector2i):
 			update_inventory_display()
 		else:
 			print("Failed to place item at: ", grid_position)
+	elif grid_manager.get_tile(grid_position) != null and grid_manager.get_tile(grid_position).is_occupied():
+		# Show info about the placed item
+		var tile = grid_manager.get_tile(grid_position)
+		var item = tile.get_item()
+		print("Tile at ", grid_position, " contains: ", item.name)
+	else:
+		print("No item selected and tile is empty")
+
+func _on_tile_gui_input(event: InputEvent, grid_position: Vector2i):
+	"""Handle mobile-friendly input for tile interaction"""
+	if event is InputEventScreenTouch:
+		var touch_event = event as InputEventScreenTouch
+		if touch_event.pressed:
+			# Start long press timer
+			pressed_tile = grid_position
+			is_long_pressing = false
+			long_press_timer.start()
+			# Visual feedback for long press start
+			show_long_press_indicator(grid_position, true)
+		else:
+			# Touch released
+			if not is_long_pressing:
+				# Short press - handle normally
+				_on_tile_button_pressed(grid_position)
+			# Reset long press state
+			pressed_tile = Vector2i(-1, -1)
+			is_long_pressing = false
+			long_press_timer.stop()
+			# Remove visual feedback
+			show_long_press_indicator(grid_position, false)
+	elif event is InputEventMouseButton:
+		var mouse_event = event as InputEventMouseButton
+		if mouse_event.button_index == MOUSE_BUTTON_RIGHT and mouse_event.pressed:
+			# Right click - remove item
+			remove_item_from_tile(grid_position)
+		elif mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.pressed:
+			# Left click - handle normally
+			_on_tile_button_pressed(grid_position)
+
+func _on_long_press_timeout():
+	"""Handle long press timeout for item removal"""
+	if pressed_tile != Vector2i(-1, -1):
+		is_long_pressing = true
+		remove_item_from_tile(pressed_tile)
+		show_removal_feedback(pressed_tile)
+
+func remove_item_from_tile(grid_position: Vector2i):
+	"""Remove item from a grid tile"""
+	var tile = grid_manager.get_tile(grid_position)
+	if tile != null and tile.is_occupied():
+		var removed_item = grid_manager.remove_item(grid_position)
+		if removed_item != null:
+			print("Removed ", removed_item.name, " from position ", grid_position)
+			# Add item back to inventory
+			PlayerData.add_item_to_inventory(removed_item)
+			update_grid_display()
+			update_inventory_display()
+			show_removal_feedback(grid_position)
+		else:
+			print("Failed to remove item from position ", grid_position)
+	else:
+		print("No item to remove at position ", grid_position)
+
+func show_removal_feedback(grid_position: Vector2i):
+	"""Show visual feedback for item removal"""
+	# Create a temporary visual feedback
+	var feedback = ColorRect.new()
+	feedback.color = Color.RED
+	feedback.modulate.a = 0.5
+	feedback.anchor_right = 1.0
+	feedback.anchor_bottom = 1.0
+	
+	var tile_button = grid_tile_buttons[grid_position.x][grid_position.y]
+	tile_button.add_child(feedback)
+	
+	# Animate the feedback
+	var tween = create_tween()
+	tween.tween_property(feedback, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(feedback.queue_free)
+
+func show_long_press_indicator(grid_position: Vector2i, show: bool):
+	"""Show/hide visual indicator for long press"""
+	var tile_button = grid_tile_buttons[grid_position.x][grid_position.y]
+	if tile_button == null:
+		return
+	
+	# Remove existing indicator
+	var existing_indicator = tile_button.get_node_or_null("LongPressIndicator")
+	if existing_indicator != null:
+		existing_indicator.queue_free()
+	
+	if show:
+		# Create new indicator
+		var indicator = ColorRect.new()
+		indicator.name = "LongPressIndicator"
+		indicator.color = Color.ORANGE
+		indicator.modulate.a = 0.3
+		indicator.anchor_right = 1.0
+		indicator.anchor_bottom = 1.0
+		tile_button.add_child(indicator)
+		
+		# Animate the indicator
+		var tween = create_tween()
+		tween.set_loops()
+		tween.tween_property(indicator, "modulate:a", 0.6, 0.4)
+		tween.tween_property(indicator, "modulate:a", 0.3, 0.4)
 
 func _on_tile_hovered(grid_position: Vector2i):
 	"""Handle tile hover for visual feedback"""
@@ -321,29 +441,29 @@ func start_tutorial():
 	add_child(tutorial_overlay)
 	
 	var tutorial_panel = Panel.new()
-	tutorial_panel.anchor_left = 0.2
-	tutorial_panel.anchor_right = 0.8
-	tutorial_panel.anchor_top = 0.3
-	tutorial_panel.anchor_bottom = 0.7
+	tutorial_panel.anchor_left = 0.15
+	tutorial_panel.anchor_right = 0.85
+	tutorial_panel.anchor_top = 0.2
+	tutorial_panel.anchor_bottom = 0.8
 	tutorial_overlay.add_child(tutorial_panel)
 	
 	var tutorial_text = Label.new()
-	tutorial_text.text = "Welcome to the Stellar Grid!\n\nThis is your space station's power and research hub. You have 3 starter modules:\n\n• Power Core: Generates credits\n• Extractor: Processes scrap\n• Research Lab: Creates blueprint fragments\n\nClick on a module, then click on an empty grid tile to place it!"
-	tutorial_text.anchor_left = 0.1
-	tutorial_text.anchor_right = 0.9
-	tutorial_text.anchor_top = 0.1
-	tutorial_text.anchor_bottom = 0.8
+	tutorial_text.text = "Welcome to the Stellar Grid!\n\nThis is your space station's power and research hub. You have 3 starter modules:\n\n• Power Core: Generates credits\n• Extractor: Processes scrap\n• Research Lab: Creates blueprint fragments\n\n📱 Mobile Controls:\n• Tap to place modules\n• Long press (0.8s) to remove modules\n• Right-click to remove (desktop)\n\nClick on a module, then click on an empty grid tile to place it!"
+	tutorial_text.anchor_left = 0.05
+	tutorial_text.anchor_right = 0.95
+	tutorial_text.anchor_top = 0.05
+	tutorial_text.anchor_bottom = 0.75
 	tutorial_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	tutorial_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tutorial_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tutorial_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	tutorial_text.vertical_alignment = VERTICAL_ALIGNMENT_TOP
 	tutorial_panel.add_child(tutorial_text)
 	
 	var close_button = Button.new()
 	close_button.text = "Got it!"
 	close_button.anchor_left = 0.3
 	close_button.anchor_right = 0.7
-	close_button.anchor_top = 0.85
-	close_button.anchor_bottom = 0.95
+	close_button.anchor_top = 0.8
+	close_button.anchor_bottom = 0.9
 	close_button.pressed.connect(func(): 
 		tutorial_overlay.queue_free()
 		_on_tutorial_completed()

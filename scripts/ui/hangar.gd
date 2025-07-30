@@ -13,14 +13,16 @@ var stellar_grid_panel: Control = null
 
 func _ready():
 	PlayerData.load_game()
-	build_label.text = "Build: " + BuildVersion.BUILD_VERSION + " - " + BuildVersion.BUILD_TIMESTAMP
-	credits_label.text = "Credits: " + str(PlayerData.credits)
-	scrap_label.text = "Scrap: " + str(PlayerData.scrap)
+	update_ui_display()
 	
 	# Connect button signals
 	launch_button.pressed.connect(_on_launch_button_pressed)
 	ship_loadout_button.pressed.connect(_on_ship_loadout_button_pressed)
 	stellar_grid_button.pressed.connect(_on_stellar_grid_button_pressed)
+	
+	# Connect to PlayerData signals for dynamic updates
+	PlayerData.credits_changed.connect(_on_credits_changed)
+	PlayerData.scrap_changed.connect(_on_scrap_changed)
 	
 	# Simple entrance animations
 	_animate_ui_elements()
@@ -98,8 +100,33 @@ func _on_launch_game_pressed():
 	if not has_weapon or not has_engine:
 		print("Please equip at least one weapon and one engine before launching!")
 		return
-	
-	# If properly equipped, launch the game
+
+func update_ui_display():
+	"""Update all UI elements with current data"""
+	build_label.text = "Build: " + BuildVersion.BUILD_VERSION + " - " + BuildVersion.BUILD_TIMESTAMP
+	credits_label.text = "Credits: " + str(PlayerData.credits)
+	scrap_label.text = "Scrap: " + str(PlayerData.scrap)
+
+func _on_credits_changed(new_amount: int):
+	"""Handle credits change with animation"""
+	credits_label.text = "Credits: " + str(new_amount)
+	_animate_value_change(credits_label)
+
+func _on_scrap_changed(new_amount: int):
+	"""Handle scrap change with animation"""
+	scrap_label.text = "Scrap: " + str(new_amount)
+	_animate_value_change(scrap_label)
+
+func _animate_value_change(label: Label):
+	"""Animate a label when its value changes"""
+	# Create a subtle scale animation
 	var tween = create_tween()
-	tween.tween_property(self, "modulate:a", 0.0, 0.3)
-	tween.tween_callback(func(): get_tree().change_scene_to_file("res://scenes/game/node_2d.tscn"))
+	tween.set_parallel(true)
+	
+	# Scale up slightly
+	tween.tween_property(label, "scale", Vector2(1.1, 1.1), 0.1)
+	tween.tween_property(label, "modulate", Color.YELLOW, 0.1)
+	
+	# Scale back down
+	tween.tween_property(label, "scale", Vector2(1.0, 1.0), 0.2).set_delay(0.1)
+	tween.tween_property(label, "modulate", Color.WHITE, 0.2).set_delay(0.1)

@@ -61,12 +61,25 @@ func setup_grid_manager():
 	grid_manager.tile_placed.connect(_on_tile_placed)
 	grid_manager.tile_removed.connect(_on_tile_removed)
 	add_child(grid_manager)
+	
+	# Wait a frame for the grid manager to load data, then refresh UI
+	await get_tree().process_frame
+	refresh_grid_ui()
+
+func refresh_grid_ui():
+	"""Refresh the grid UI to match the current grid state"""
+	create_grid_ui()
+	update_grid_display()
+	update_grid_info()
 
 func create_grid_ui():
 	"""Create the visual grid UI"""
 	# Get grid size from grid manager
 	if grid_manager != null:
 		grid_size = grid_manager.grid_size
+	
+	# Clear existing grid UI
+	clear_grid_ui()
 	
 	grid_container.columns = grid_size.x
 	
@@ -80,6 +93,15 @@ func create_grid_ui():
 			var tile_button = create_tile_button(Vector2i(x, y))
 			grid_container.add_child(tile_button)
 			grid_tile_buttons[x][y] = tile_button
+
+func clear_grid_ui():
+	"""Clear the existing grid UI"""
+	# Remove existing tile buttons
+	for child in grid_container.get_children():
+		child.queue_free()
+	
+	# Clear the buttons array
+	grid_tile_buttons.clear()
 
 func create_tile_button(grid_position: Vector2i) -> Button:
 	"""Create a button for a grid tile"""
@@ -366,6 +388,12 @@ func update_grid_display():
 func update_tile_display(grid_position: Vector2i):
 	"""Update the display of a specific tile"""
 	var tile = grid_manager.get_tile(grid_position)
+	
+	# Check if grid_tile_buttons array is valid for this position
+	if grid_position.x >= grid_tile_buttons.size() or grid_position.y >= grid_tile_buttons[0].size():
+		print("Warning: Grid position ", grid_position, " is out of bounds for UI buttons")
+		return
+	
 	var button = grid_tile_buttons[grid_position.x][grid_position.y]
 	
 	if tile == null or button == null:

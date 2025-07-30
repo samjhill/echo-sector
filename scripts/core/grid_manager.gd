@@ -70,8 +70,67 @@ func load_grid_data():
 		var parse_result = json.parse(json_string)
 		if parse_result == OK:
 			var data = json.data
-			# TODO: Implement grid loading from save data
+			print("Loaded grid data structure: ", data)
+			
+			# Load placed tiles first (before changing grid size)
+			var tiles_to_load = []
+			if data.has("tiles"):
+				for tile_data in data.tiles:
+					var position_data = tile_data.position
+					var position: Vector2i
+					
+					if position_data is Dictionary:
+						position = Vector2i(position_data.x, position_data.y)
+					elif position_data is Array and position_data.size() >= 2:
+						position = Vector2i(position_data[0], position_data[1])
+					else:
+						print("Warning: Invalid position format in tile data")
+						continue
+					
+					var item_name = tile_data.item_name
+					var item_type = tile_data.item_type
+					
+					tiles_to_load.append({
+						"position": position,
+						"item_name": item_name,
+						"item_type": item_type
+					})
+			
+			# Load grid size if it exists
+			if data.has("grid_size"):
+				var grid_size_data = data.grid_size
+				if grid_size_data is Dictionary:
+					grid_size = Vector2i(grid_size_data.x, grid_size_data.y)
+				elif grid_size_data is Array and grid_size_data.size() >= 2:
+					grid_size = Vector2i(grid_size_data[0], grid_size_data[1])
+				else:
+					print("Warning: Invalid grid_size format in save data")
+					grid_size = Vector2i(3, 3)  # Default fallback
+			
+			# Reinitialize grid with new size
+			initialize_grid()
+			
+			# Now place the items on the newly initialized grid
+			for tile_data in tiles_to_load:
+				var item = find_item_by_name(tile_data.item_name)
+				if item != null:
+					var position = tile_data.position
+					# Check if position is valid for the new grid size
+					if is_valid_position(position):
+						var tile = grid_tiles[position.x][position.y]
+						tile.place_item(item)
+						tile_placed.emit(position, item)
+						print("Loaded item ", tile_data.item_name, " at position ", position)
+					else:
+						print("Warning: Position ", position, " is invalid for grid size ", grid_size)
+				else:
+					print("Warning: Could not find item ", tile_data.item_name, " for loading")
+			
 			print("Grid data loaded from save file")
+		else:
+			print("Error parsing grid save data")
+	else:
+		print("No grid save file found, starting with empty grid")
 
 func save_grid_data():
 	"""Save current grid state to file"""
@@ -207,11 +266,11 @@ func _on_production_tick():
 					else:
 						resources_generated[resource_type] = total_amount
 	
-	# Add generated resources to player data
+	# Add generated resources to player data using signal-emitting functions
 	if resources_generated.credits > 0:
-		PlayerData.credits += resources_generated.credits
+		PlayerData.add_credits(resources_generated.credits)
 	if resources_generated.scrap > 0:
-		PlayerData.scrap += resources_generated.scrap
+		PlayerData.add_scrap(resources_generated.scrap)
 	
 	# Store research and discovery points for future use
 	if resources_generated.research_points > 0:
@@ -244,4 +303,79 @@ func _on_modifier_applied(modifier: Dictionary):
 
 func _on_event_triggered(event: Dictionary):
 	"""Handle random event"""
-	print("Event triggered: ", event.name) 
+	print("Event triggered: ", event.name)
+
+func find_item_by_name(item_name: String) -> Item:
+	"""Find an item by name in the player's inventory or create it if it's a grid module"""
+	# First, try to find in player inventory
+	for item in PlayerData.inventory:
+		if item != null and item.name == item_name:
+			return item
+	
+	# If not found in inventory, try to create it based on the name
+	# This handles cases where items were on the grid but not in inventory
+	if item_name.contains("Power Core"):
+		return create_power_core_item()
+	elif item_name.contains("Extractor"):
+		return create_extractor_item()
+	elif item_name.contains("Research Lab"):
+		return create_research_lab_item()
+	
+	print("Could not find or create item: ", item_name)
+	return null
+
+func create_power_core_item() -> Item:
+	"""Create a Power Core item"""
+	var item = load("res://scripts/core/item.gd").new()
+	item.name = "Power Core Mk I"
+	item.description = "Basic power generation module. Provides energy to adjacent modules."
+	item.slot_type = "grid_module"
+	item.icon_path = "res://assets/textures/plasma-core.png"
+	item.stats = {
+		"production": {
+			"credits": 2
+		},
+		"adjacency_bonus": {
+			"type": "power",
+			"bonus": 0.2
+		}
+	}
+	item.type = "grid_module"
+	if item.icon_path != "":
+		item.icon = load(item.icon_path)
+	return item
+
+func create_extractor_item() -> Item:
+	"""Create an Extractor item"""
+	var item = load("res://scripts/core/item.gd").new()
+	item.name = "Extractor Mk I"
+	item.description = "Processes raw materials into scrap metal. Benefits from power adjacency."
+	item.slot_type = "grid_module"
+	item.icon_path = "res://assets/textures/uranium.png"
+	item.stats = {
+		"production": {
+			"scrap": 3
+		}
+	}
+	item.type = "grid_module"
+	if item.icon_path != "":
+		item.icon = load(item.icon_path)
+	return item
+
+func create_research_lab_item() -> Item:
+	"""Create a Research Lab item"""
+	var item = load("res://scripts/core/item.gd").new()
+	item.name = "Research Lab Mk I"
+	item.description = "Generates research points and blueprint fragments for technology development."
+	item.slot_type = "grid_module"
+	item.icon_path = "res://assets/textures/portal.png"
+	item.stats = {
+		"production": {
+			"research_points": 1,
+			"blueprint_fragments": 1
+		}
+	}
+	item.type = "grid_module"
+	if item.icon_path != "":
+		item.icon = load(item.icon_path)
+	return item 

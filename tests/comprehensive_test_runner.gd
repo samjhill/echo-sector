@@ -35,6 +35,8 @@ func _setup_test_suites():
 	test_suites.append(PlayerDataTestSuite.new())
 	test_suites.append(ResourceLoadingTestSuite.new())
 	test_suites.append(EquipmentSystemTestSuite.new())
+	test_suites.append(EquipmentValidationTestSuite.new())
+	test_suites.append(LaunchValidationTestSuite.new())
 	
 	# Stellar Grid tests
 	test_suites.append(StellarGridTestSuite.new())

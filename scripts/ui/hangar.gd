@@ -46,7 +46,31 @@ func _animate_ui_elements():
 	tween.tween_property(upgrade_panel, "modulate:a", 1.0, 0.3).set_delay(0.5)
 
 func _on_launch_button_pressed():
-	# Simple fade out before scene change
+	"""Launch button pressed - check equipment and launch game"""
+	# Check if player has proper equipment
+	var has_weapon = false
+	var has_engine = false
+	
+	var equipped_weapons = PlayerData.get_equipped_weapons()
+	for weapon in equipped_weapons:
+		if weapon != null:
+			has_weapon = true
+			break
+	
+	var equipped_engines = PlayerData.get_equipped_engines()
+	for engine in equipped_engines:
+		if engine != null:
+			has_engine = true
+			break
+	
+	if not has_weapon or not has_engine:
+		Logger.warning("Please equip at least one weapon and one engine before launching!", "Hangar")
+		# Open the equipment screen to help the player equip items
+		_open_equipment_screen_for_missing_equipment()
+		return
+	
+	# Launch the game with fade out
+	Logger.info("Launching game with equipment validation passed", "Hangar")
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.3)
 	tween.tween_callback(func(): get_tree().change_scene_to_file("res://scenes/game/node_2d.tscn"))
@@ -54,6 +78,16 @@ func _on_launch_button_pressed():
 func _on_ship_loadout_button_pressed():
 	ship_loadout_panel.visible = true
 	ship_loadout_panel.populate_equipment_screen()
+	
+	# Simple fade in for the equipment screen
+	ship_loadout_panel.modulate.a = 0.0
+	var tween = create_tween()
+	tween.tween_property(ship_loadout_panel, "modulate:a", 1.0, 0.3)
+
+func _open_equipment_screen_for_missing_equipment():
+	"""Open the equipment screen with notification about missing equipment"""
+	ship_loadout_panel.visible = true
+	ship_loadout_panel.populate_equipment_screen(true)  # Show missing equipment notification
 	
 	# Simple fade in for the equipment screen
 	ship_loadout_panel.modulate.a = 0.0
@@ -82,24 +116,7 @@ func _on_stellar_grid_visibility_changed():
 		# Grid screen was closed, we can clean up if needed
 		pass
 
-func _on_launch_game_pressed():
-	# Check if player has proper equipment
-	var has_weapon = false
-	var has_engine = false
-	
-	for weapon in PlayerData.equipped_weapons:
-		if weapon != null:
-			has_weapon = true
-			break
-	
-	for engine in PlayerData.get_equipped_engines():
-		if engine != null:
-			has_engine = true
-			break
-	
-	if not has_weapon or not has_engine:
-		print("Please equip at least one weapon and one engine before launching!")
-		return
+# Removed duplicate _on_launch_game_pressed() function - using _on_launch_button_pressed() instead
 
 func update_ui_display():
 	"""Update all UI elements with current data"""

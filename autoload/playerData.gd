@@ -20,13 +20,20 @@ func save_game():
 	var serialized_inventory = []
 	for item in inventory:
 		if item != null:
+			# Determine the correct resource path based on the item type
+			var resource_path = "res://scripts/core/item.gd"
+			if item is LaserWeapon:
+				resource_path = "res://components/laserWeapon.gd"
+			elif item is RailgunWeapon:
+				resource_path = "res://components/railgunWeapon.gd"
+			
 			serialized_inventory.append({
 				"name": item.name,
 				"description": item.description,
 				"icon_path": item.icon_path,
 				"slot_type": item.slot_type,
 				"stats": item.stats,
-				"resource_path": "res://scripts/core/item.gd"
+				"resource_path": resource_path
 			})
 		else:
 			Logger.warning("Found null item in inventory during save", "PlayerData")
@@ -38,26 +45,40 @@ func save_game():
 			serialized_equipment[slot] = []
 			for item in items:
 				if item != null:
+					# Determine the correct resource path based on the item type
+					var resource_path = "res://scripts/core/item.gd"
+					if item is LaserWeapon:
+						resource_path = "res://components/laserWeapon.gd"
+					elif item is RailgunWeapon:
+						resource_path = "res://components/railgunWeapon.gd"
+					
 					serialized_equipment[slot].append({
 						"name": item.name,
 						"description": item.description,
 						"icon_path": item.icon_path,
 						"slot_type": item.slot_type,
 						"stats": item.stats,
-						"resource_path": "res://scripts/core/item.gd"
+						"resource_path": resource_path
 					})
 				else:
 					Logger.warning("Found null item in equipped_components[%s] during save" % slot, "PlayerData")
 		else:
 			# Backward compatibility: single item
 			if items != null:
+				# Determine the correct resource path based on the item type
+				var resource_path = "res://scripts/core/item.gd"
+				if items is LaserWeapon:
+					resource_path = "res://components/laserWeapon.gd"
+				elif items is RailgunWeapon:
+					resource_path = "res://components/railgunWeapon.gd"
+				
 				serialized_equipment[slot] = [{
 					"name": items.name,
 					"description": items.description,
 					"icon_path": items.icon_path,
 					"slot_type": items.slot_type,
 					"stats": items.stats,
-					"resource_path": "res://scripts/core/item.gd"
+					"resource_path": resource_path
 				}]
 			else:
 				Logger.warning("Found null item in equipped_components[%s] during save" % slot, "PlayerData")
@@ -95,7 +116,7 @@ func load_game():
 				"description": "Basic kinetic weapon.",
 				"slot_type": "weapon",
 				"icon_path": "res://items/plasma-core.png",
-				"resource_path": "res://scripts/core/item.gd"
+				"resource_path": "res://components/railgunWeapon.gd"
 			},
 			{
 				"name": "Basic Thruster",
@@ -108,7 +129,14 @@ func load_game():
 		
 		# Add starter items to inventory
 		for item_data in starter_items:
-			var item = load("res://scripts/core/item.gd").new()
+			var resource_path = item_data.get("resource_path", "res://scripts/core/item.gd")
+			var item_resource = load(resource_path)
+			
+			if item_resource == null:
+				Logger.warning("Failed to load resource: %s, falling back to Item" % resource_path, "PlayerData")
+				item_resource = load("res://scripts/core/item.gd")
+			
+			var item = item_resource.new()
 			item.name = item_data.get("name", "")
 			item.description = item_data.get("description", "")
 			item.slot_type = item_data.get("slot_type", "")
@@ -234,9 +262,9 @@ func load_game():
 					var item_resource
 					if slot == "weapon" and (resource_path == "res://components/laserWeapon.gd" or item_data.get("name", "").contains("Laser")):
 						item_resource = load("res://components/laserWeapon.gd")
-					if item_resource == null:
-						Logger.warning("Failed to load laserWeapon.gd, falling back to Item", "PlayerData")
-						item_resource = load("res://scripts/core/item.gd")
+						if item_resource == null:
+							Logger.warning("Failed to load laserWeapon.gd, falling back to Item", "PlayerData")
+							item_resource = load("res://scripts/core/item.gd")
 					elif slot == "weapon" and item_data.get("name", "").contains("Railgun"):
 						item_resource = load("res://components/railgunWeapon.gd")
 						if item_resource == null:

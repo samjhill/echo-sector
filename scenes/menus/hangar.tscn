@@ -95,7 +95,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_font_sizes/font_size = 22
-text = "🤖 Drone Bay (Coming Soon)"
+text = "Drone Bay (Coming Soon)"
 horizontal_alignment = 1
 
 [node name="UpgradePanel" type="PanelContainer" parent="MainContainer/ComingSoonSection"]
@@ -106,7 +106,7 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
 theme_override_font_sizes/font_size = 22
-text = "🔧 Upgrades (Coming Soon)"
+text = "Upgrades (Coming Soon)"
 horizontal_alignment = 1
 
 [node name="HSeparator2" type="HSeparator" parent="MainContainer"]
@@ -124,7 +124,7 @@ theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 28
-text = "🚀 LAUNCH MISSION"
+text = "LAUNCH MISSION"
 
 [node name="ShipLoadoutButton" type="Button" parent="MainContainer/ActionSection"]
 custom_minimum_size = Vector2(0, 100)
@@ -133,7 +133,7 @@ theme_override_colors/font_hover_color = Color(1, 1, 1, 1)
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_colors/font_pressed_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 28
-text = "⚙️ SHIP LOADOUT"
+text = "SHIP LOADOUT"
 
 [node name="ShipEquipmentScreen" parent="." instance=ExtResource("6_g2g6c")]
 visible = false

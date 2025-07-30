@@ -182,6 +182,11 @@ func refresh_grid_ui():
 	create_grid_ui()
 	update_grid_display()
 	update_grid_info()
+	
+	# Update buff visuals after grid UI is refreshed
+	if buff_visual_manager:
+		buff_visual_manager.update_all_buff_visuals()
+		Logger.info("Updated buff visuals after grid UI refresh", "StellarGridUI")
 
 func setup_inventory_display():
 	"""Setup the inventory display"""

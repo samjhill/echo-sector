@@ -61,6 +61,10 @@ func setup_buff_visual_manager(visual_manager: BuffVisualManager):
 	if buff_visual_manager:
 		buff_visual_manager.setup(self, null)  # grid_container will be set by UI
 		Logger.info("Buff visual manager connected", "GridManager")
+		
+		# Update buff visuals after setup to show existing interactions
+		buff_visual_manager.update_all_buff_visuals()
+		Logger.info("Updated buff visuals after buff visual manager setup", "GridManager")
 
 func load_grid_data():
 	"""Load grid data from save file"""
@@ -129,6 +133,11 @@ func load_grid_data():
 				Logger.warning("Could not find item %s for loading" % tile_data.item_name, "GridManager")
 		
 		Logger.info("Grid data loaded from save file", "GridManager")
+		
+		# Update buff visuals after loading grid data
+		if buff_visual_manager:
+			buff_visual_manager.update_all_buff_visuals()
+			Logger.info("Updated buff visuals after loading grid data", "GridManager")
 	else:
 		Logger.error("Error parsing grid save data", "GridManager")
 

@@ -6,11 +6,11 @@ signal item_placed_on_grid(grid_position: Vector2i, item: Item)
 signal item_removed_from_grid(grid_position: Vector2i, item: Item)
 
 # UI References
-@onready var grid_container: GridContainer = $MainContainer/Content/TopRow/GridSection/GridContainer
-@onready var inventory_panel: Panel = $MainContainer/Content/InventorySection/InventoryPanel
-@onready var production_display: Label = $MainContainer/Content/TopRow/InfoSection/ProductionDisplay
-@onready var grid_info_label: Label = $MainContainer/Content/TopRow/InfoSection/GridInfoLabel
-@onready var close_button: Button = $MainContainer/Header/CloseButton
+var grid_container: GridContainer
+var inventory_panel: Panel
+var production_display: Label
+var grid_info_label: Label
+var close_button: Button
 
 # Grid management
 var grid_manager: GridManager
@@ -23,10 +23,29 @@ var grid_size: Vector2i = Vector2i(3, 3)  # Start with 3x3
 const TILE_SIZE := 60
 
 func _ready():
+	# Get references manually since scene is loaded dynamically
+	grid_container = $MainContainer/Content/TopRow/GridSection/GridContainer
+	inventory_panel = $MainContainer/Content/InventorySection/InventoryPanel
+	production_display = $MainContainer/Content/TopRow/InfoSection/ProductionDisplay
+	grid_info_label = $MainContainer/Content/TopRow/InfoSection/GridInfoLabel
+	close_button = $MainContainer/Header/CloseButton
+	
+	print("Grid container found: ", grid_container != null)
+	print("Inventory panel found: ", inventory_panel != null)
+	print("Production display found: ", production_display != null)
+	print("Grid info label found: ", grid_info_label != null)
+	print("Close button found: ", close_button != null)
+	
 	setup_grid_manager()
 	create_grid_ui()
 	setup_inventory_display()
 	connect_signals()
+	
+	# Check if tutorial should be shown
+	if not PlayerData.get_tutorial_completed("stellar_grid", false):
+		start_tutorial()
+	else:
+		print("Tutorial already completed, skipping...")
 
 func setup_grid_manager():
 	"""Initialize the grid manager"""
@@ -90,6 +109,13 @@ func connect_signals():
 
 func update_inventory_display():
 	"""Update the inventory display with grid-compatible items"""
+	# Debug: check if inventory panel exists
+	if inventory_panel == null:
+		print("ERROR: inventory_panel is null!")
+		return
+	
+	print("Inventory panel found: ", inventory_panel.name)
+	
 	# Clear existing inventory display
 	var inventory_vbox = inventory_panel.get_node("InventoryScroll/InventoryVBox")
 	if inventory_vbox != null:
@@ -99,18 +125,57 @@ func update_inventory_display():
 		
 		# Create inventory items display
 		var grid_items = get_grid_compatible_items()
+		print("Found ", grid_items.size(), " grid-compatible items in inventory")
 		for item in grid_items:
+			print("  - ", item.name, " (", item.type, ")")
 			var item_button = create_inventory_item_button(item)
 			inventory_vbox.add_child(item_button)
+	else:
+		print("ERROR: Could not find InventoryVBox in inventory panel")
+		# Try alternative path
+		inventory_vbox = inventory_panel.get_node("InventoryScroll/InventoryVBox")
+		if inventory_vbox != null:
+			print("Found inventory vbox with alternative path")
+			for child in inventory_vbox.get_children():
+				if child.has_method("queue_free"):
+					child.queue_free()
+			
+			var grid_items = get_grid_compatible_items()
+			print("Found ", grid_items.size(), " grid-compatible items in inventory")
+			for item in grid_items:
+				print("  - ", item.name, " (", item.type, ")")
+				var item_button = create_inventory_item_button(item)
+				inventory_vbox.add_child(item_button)
+		else:
+			print("ERROR: Could not find InventoryVBox with any path")
+			# Debug: print the actual structure
+			print("Inventory panel children:")
+			for child in inventory_panel.get_children():
+				print("  - ", child.name, " (", child.get_class(), ")")
+				if child.name == "InventoryScroll":
+					print("    InventoryScroll children:")
+					for grandchild in child.get_children():
+						print("      - ", grandchild.name, " (", grandchild.get_class(), ")")
 
 func get_grid_compatible_items() -> Array[Item]:
 	"""Get items from inventory that can be placed on the grid"""
 	var compatible_items: Array[Item] = []
 	
-	for item in PlayerData.inventory:
-		if item != null and item.type == "grid_module":
-			compatible_items.append(item)
+	print("Checking inventory for grid-compatible items...")
+	print("Total inventory items: ", PlayerData.inventory.size())
 	
+	# Debug: print all inventory items
+	for i in range(PlayerData.inventory.size()):
+		var item = PlayerData.inventory[i]
+		if item != null:
+			print("  Item ", i, ": ", item.name, " (type: ", item.type, ", slot_type: ", item.slot_type, ")")
+			if item.type == "grid_module":
+				compatible_items.append(item)
+				print("    -> Added to grid-compatible items")
+		else:
+			print("  Item ", i, ": null")
+	
+	print("Total grid-compatible items: ", compatible_items.size())
 	return compatible_items
 
 func create_inventory_item_button(item: Item) -> Button:
@@ -243,6 +308,52 @@ func handle_right_click():
 	# This would be implemented to remove items from tiles
 	# For now, just a placeholder
 	pass
+
+func start_tutorial():
+	"""Start the tutorial if not completed"""
+	print("Starting Stellar Grid tutorial...")
+	
+	# Create a simple tutorial overlay
+	var tutorial_overlay = ColorRect.new()
+	tutorial_overlay.color = Color(0, 0, 0, 0.7)
+	tutorial_overlay.anchor_right = 1.0
+	tutorial_overlay.anchor_bottom = 1.0
+	add_child(tutorial_overlay)
+	
+	var tutorial_panel = Panel.new()
+	tutorial_panel.anchor_left = 0.2
+	tutorial_panel.anchor_right = 0.8
+	tutorial_panel.anchor_top = 0.3
+	tutorial_panel.anchor_bottom = 0.7
+	tutorial_overlay.add_child(tutorial_panel)
+	
+	var tutorial_text = Label.new()
+	tutorial_text.text = "Welcome to the Stellar Grid!\n\nThis is your space station's power and research hub. You have 3 starter modules:\n\n• Power Core: Generates credits\n• Extractor: Processes scrap\n• Research Lab: Creates blueprint fragments\n\nClick on a module, then click on an empty grid tile to place it!"
+	tutorial_text.anchor_left = 0.1
+	tutorial_text.anchor_right = 0.9
+	tutorial_text.anchor_top = 0.1
+	tutorial_text.anchor_bottom = 0.8
+	tutorial_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	tutorial_text.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	tutorial_text.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	tutorial_panel.add_child(tutorial_text)
+	
+	var close_button = Button.new()
+	close_button.text = "Got it!"
+	close_button.anchor_left = 0.3
+	close_button.anchor_right = 0.7
+	close_button.anchor_top = 0.85
+	close_button.anchor_bottom = 0.95
+	close_button.pressed.connect(func(): 
+		tutorial_overlay.queue_free()
+		_on_tutorial_completed()
+	)
+	tutorial_panel.add_child(close_button)
+
+func _on_tutorial_completed():
+	"""Handle tutorial completion"""
+	print("Tutorial completed!")
+	PlayerData.set_tutorial_completed("stellar_grid", true)
 
 func _on_close_button_pressed():
 	"""Handle close button press"""

@@ -120,6 +120,64 @@ func load_game():
 		# Add starter grid items using GridItemLoader
 		GridItemLoader.add_starter_grid_items_to_inventory()
 		
+		# Also add starter items directly as fallback
+		var starter_grid_items = [
+			{
+				"name": "Power Core Mk I",
+				"description": "Basic power generation module. Provides energy to adjacent modules.",
+				"slot_type": "grid_module",
+				"icon_path": "res://assets/textures/plasma-core.png",
+				"stats": {
+					"production": {
+						"credits": 2
+					},
+					"adjacency_bonus": {
+						"type": "power",
+						"bonus": 0.2
+					}
+				}
+			},
+			{
+				"name": "Extractor Mk I",
+				"description": "Processes raw materials into scrap metal. Benefits from power adjacency.",
+				"slot_type": "grid_module",
+				"icon_path": "res://assets/textures/uranium.png",
+				"stats": {
+					"production": {
+						"scrap": 3
+					}
+				}
+			},
+			{
+				"name": "Research Lab Mk I",
+				"description": "Generates research points and blueprint fragments for technology development.",
+				"slot_type": "grid_module",
+				"icon_path": "res://assets/textures/portal.png",
+				"stats": {
+					"production": {
+						"research_points": 1,
+						"blueprint_fragments": 1
+					}
+				}
+			}
+		]
+		
+		# Add starter grid items to inventory
+		for item_data in starter_grid_items:
+			var item = load("res://scripts/core/item.gd").new()
+			item.name = item_data.get("name", "")
+			item.description = item_data.get("description", "")
+			item.slot_type = item_data.get("slot_type", "")
+			item.icon_path = item_data.get("icon_path", "")
+			item.stats = item_data.get("stats", {})
+			item.type = "grid_module"
+			if item.icon_path != "":
+				item.icon = load(item.icon_path)
+			inventory.append(item)
+			print("Added starter grid item: ", item.name, " (type: ", item.type, ", slot_type: ", item.slot_type, ")")
+		
+		print("Total inventory items after adding grid items: ", inventory.size())
+		
 		# Initialize tutorial completion tracking
 		tutorial_completed = {
 			"stellar_grid": false

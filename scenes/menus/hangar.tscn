@@ -6,7 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://5u8fy74kqjg5" path="res://assets/textures/logo.png" id="4_34qk5"]
 [ext_resource type="AudioStream" uid="uid://003h3gk0kijo" path="res://music/echo-sector-hangar-screen.wav" id="5_afel3"]
 [ext_resource type="PackedScene" uid="uid://1mm73hyamymw" path="res://scenes/ui/ship_equipment_screen.tscn" id="6_g2g6c"]
-[ext_resource type="PackedScene" path="res://scenes/ui/settings_screen.tscn" id="7_settings"]
+[ext_resource type="PackedScene" uid="uid://bqxv8y7n8lam1" path="res://scenes/ui/settings_screen.tscn" id="7_settings"]
 
 [node name="Hangar" type="Control"]
 layout_mode = 3

@@ -88,10 +88,10 @@ func _on_heal_button_pressed():
 		else:
 			print("Player doesn't have heal method!")
 
-func _on_credits_changed():
+func _on_credits_changed(new_amount: int):
 	if credits_label:
-		credits_label.text = "Credits: " + str(PlayerData.credits)
+		credits_label.text = "Credits: " + str(new_amount)
 
-func _on_scrap_changed():
+func _on_scrap_changed(new_amount: int):
 	if scrap_label:
-		scrap_label.text = "Scrap: " + str(PlayerData.scrap) 
+		scrap_label.text = "Scrap: " + str(new_amount) 

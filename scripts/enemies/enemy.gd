@@ -123,10 +123,16 @@ func take_damage(amount: int):
 		get_tree().current_scene.add_child(dmg_number)
 
 	if health <= 0:
+		_cleanup_tweens()
 		_spawn_explosion_effect()
 		grant_kill_reward()
 		enemy_killed.emit()  # Emit signal when killed
 		queue_free()
+
+func _cleanup_tweens():
+	# Kill any active tweens to prevent warnings
+	if lock_animation_tween and lock_animation_tween.is_valid():
+		lock_animation_tween.kill()
 
 func _spawn_explosion_effect():
 	# Spawn particle effect at enemy position

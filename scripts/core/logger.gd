@@ -1,5 +1,4 @@
-extends RefCounted
-class_name Logger
+extends Node
 
 enum LogLevel {
 	DEBUG,

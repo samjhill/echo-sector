@@ -6,7 +6,7 @@ var scrap_particles: Array[GPUParticles2D] = []
 func _ready():
 	# Find the player
 	var player = get_tree().get_first_node_in_group("players")
-	if player:
+	if player and is_instance_valid(player):
 		player_position = player.global_position
 	else:
 		player_position = Vector2.ZERO

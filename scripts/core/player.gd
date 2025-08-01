@@ -152,7 +152,6 @@ func _physics_process(delta):
 			velocity = direction * move_speed
 		else:
 			velocity = Vector2.ZERO
-
 	elif moving_to_target:
 		var direction = target_position - global_position
 		var distance = direction.length()
@@ -165,6 +164,11 @@ func _physics_process(delta):
 			moving_to_target = false
 			velocity = Vector2.ZERO
 	else:
+		# Clear invalid targets
+		if current_target and not is_instance_valid(current_target):
+			current_target = null
+			orbiting = false
+			
 		camera.enabled = true  # Unfreeze camera
 		var input_vector = Vector2(
 			Input.get_action_strength("ui_right") - Input.get_action_strength("ui_left"),
@@ -193,7 +197,7 @@ func _process(delta):
 		
 		for i in range(weapon_components.size()):
 			var weapon = weapon_components[i]
-			if weapon != null and current_target:
+			if weapon != null and current_target and is_instance_valid(current_target):
 				print("Processing weapon", i, ":", weapon.name, "type:", typeof(weapon), "class:", weapon.get_class())
 				if weapon is LaserWeapon:
 					print("Weapon is LaserWeapon, checking cooldown... Current cooldown:", weapon_cooldowns[i], "Required:", weapon.cooldown)
@@ -213,8 +217,9 @@ func _process(delta):
 					print("Weapon is not recognized type:", typeof(weapon), "class:", weapon.get_class())
 			elif weapon == null:
 				print("Weapon", i, "is null")
-			elif current_target == null:
-				print("No current target")
+			elif current_target == null or not is_instance_valid(current_target):
+				print("No current target or target is invalid")
+				current_target = null  # Clear invalid target
 	else:
 		current_target = null
 
@@ -305,6 +310,10 @@ func _trigger_hit_effects():
 	shake_intensity = 3.0
 
 func shoot_laser(weapon: LaserWeapon, target: Node2D):
+	if not is_instance_valid(target):
+		print("Target is invalid, skipping laser shot")
+		return
+		
 	print("shoot_laser called with weapon:", weapon.name, "target:", target.name)
 	var laser = preload("res://scenes/game/laser_projectile.tscn").instantiate()
 	
@@ -330,6 +339,10 @@ func shoot_at_target(target: Node2D):
 	get_tree().current_scene.add_child(bullet)
 
 func lock_on_target(target: Node2D):
+	if not is_instance_valid(target):
+		print("Target is invalid, cannot lock on")
+		return
+		
 	print("Locking on target:", target.name)
 	
 	# Notify tutorial system about enemy tap
@@ -342,7 +355,7 @@ func lock_on_target(target: Node2D):
 		print("Already locked on target:", target.name)
 		return
 
-	if current_target and current_target.has_method("set_locked"):
+	if current_target and is_instance_valid(current_target) and current_target.has_method("set_locked"):
 		current_target.set_locked(false)
 
 	if current_target == target:
@@ -358,6 +371,10 @@ func lock_on_target(target: Node2D):
 		_set_target(target.global_position)
 
 func shoot_railgun(weapon: RailgunWeapon, target: Node2D):
+	if not is_instance_valid(target):
+		print("Target is invalid, skipping railgun shot")
+		return
+		
 	print("shoot_railgun called with weapon:", weapon.name, "target:", target.name)
 	var projectile = preload("res://scenes/game/projectile.tscn").instantiate()
 	

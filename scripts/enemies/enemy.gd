@@ -120,7 +120,9 @@ func take_damage(amount: int):
 		var dmg_number = damage_number_scene.instantiate()
 		dmg_number.text = str(amount)
 		dmg_number.global_position = global_position
-		get_tree().current_scene.add_child(dmg_number)
+		var current_scene = get_tree().current_scene
+		if current_scene and is_instance_valid(current_scene):
+			current_scene.add_child(dmg_number)
 
 	if health <= 0:
 		_cleanup_tweens()
@@ -139,7 +141,9 @@ func _spawn_explosion_effect():
 	var explosion_scene = preload("res://scenes/game/enemy_explosion_particles.tscn")
 	var explosion = explosion_scene.instantiate()
 	explosion.global_position = global_position
-	get_tree().current_scene.add_child(explosion)
+	var current_scene = get_tree().current_scene
+	if current_scene and is_instance_valid(current_scene):
+		current_scene.add_child(explosion)
 
 func grant_kill_reward():
 	var reward = 5  # or scale by difficulty later

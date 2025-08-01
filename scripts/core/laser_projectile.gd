@@ -14,6 +14,9 @@ func _physics_process(delta):
 	position += direction.normalized() * speed * delta
 	
 func _on_body_entered(body):
+	if not is_instance_valid(body):
+		return
+		
 	if body.has_method("take_damage"):
 		body.take_damage(damage)
 	queue_free()  # Destroy the laser after hitting

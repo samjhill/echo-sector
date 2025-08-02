@@ -50,14 +50,17 @@ func _spawn_scrap_particles():
 		
 		scrap_particle.process_material = scrap_material
 		scrap_particle.global_position = global_position
-		get_tree().current_scene.add_child(scrap_particle)
-		
-		# Start emitting
-		scrap_particle.emitting = true
-		
-		# Store reference for cleanup
-		scrap_particles.append(scrap_particle)
-		
-		# Clean up after animation
-		await get_tree().create_timer(1.5).timeout
-		scrap_particle.queue_free() 
+		var current_scene = get_tree().current_scene
+		if current_scene and is_instance_valid(current_scene):
+			current_scene.add_child(scrap_particle)
+			
+			# Start emitting
+			scrap_particle.emitting = true
+			
+			# Store reference for cleanup
+			scrap_particles.append(scrap_particle)
+			
+			# Clean up after animation
+			await get_tree().create_timer(1.5).timeout
+			if is_instance_valid(scrap_particle):
+				scrap_particle.queue_free() 

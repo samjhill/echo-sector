@@ -32,7 +32,7 @@ func _ready():
 func set_locked(is_locked: bool):
 	print("set_locked called on ", self.name, " — locked: ", is_locked)
 	
-	if not lock_ring:
+	if not lock_ring or not is_instance_valid(lock_ring):
 		return
 		
 	if is_locked:
@@ -44,11 +44,11 @@ func set_locked(is_locked: bool):
 		_animate_lock_ring_out()
 
 func _animate_lock_ring_in():
-	if not lock_ring:
+	if not lock_ring or not is_instance_valid(lock_ring):
 		return
 		
 	# Stop any existing animation
-	if lock_animation_tween:
+	if lock_animation_tween and lock_animation_tween.is_valid():
 		lock_animation_tween.kill()
 	
 	lock_animation_tween = create_tween()
@@ -66,11 +66,11 @@ func _animate_lock_ring_in():
 	_start_lock_ring_rotation()
 
 func _animate_lock_ring_out():
-	if not lock_ring:
+	if not lock_ring or not is_instance_valid(lock_ring):
 		return
 		
 	# Stop any existing animation
-	if lock_animation_tween:
+	if lock_animation_tween and lock_animation_tween.is_valid():
 		lock_animation_tween.kill()
 	
 	lock_animation_tween = create_tween()
@@ -80,11 +80,14 @@ func _animate_lock_ring_out():
 	lock_animation_tween.tween_property(lock_ring, "scale", Vector2(0.1, 0.1), 0.2).set_ease(Tween.EASE_IN)
 	lock_animation_tween.tween_property(lock_ring, "modulate:a", 0.0, 0.2).set_ease(Tween.EASE_IN)
 	
-	# Hide after animation
-	lock_animation_tween.tween_callback(func(): lock_ring.visible = false)
+	# Hide after animation with safety check
+	lock_animation_tween.tween_callback(func(): 
+		if lock_ring and is_instance_valid(lock_ring):
+			lock_ring.visible = false
+	)
 
 func _start_lock_ring_rotation():
-	if not lock_ring or not lock_ring.visible:
+	if not lock_ring or not is_instance_valid(lock_ring) or not lock_ring.visible:
 		return
 		
 	# Create a continuous rotation animation
@@ -135,6 +138,7 @@ func _cleanup_tweens():
 	# Kill any active tweens to prevent warnings
 	if lock_animation_tween and lock_animation_tween.is_valid():
 		lock_animation_tween.kill()
+		lock_animation_tween = null
 
 func _spawn_explosion_effect():
 	# Spawn particle effect at enemy position

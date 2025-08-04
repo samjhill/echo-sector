@@ -14,6 +14,7 @@ var fire_timer := 0.0
 var health: int
 var lock_ring: Sprite2D
 var lock_animation_tween: Tween
+var rotation_tween: Tween  # Add reference to rotation tween
 
 func _ready():
 	health = max_health
@@ -48,8 +49,7 @@ func _animate_lock_ring_in():
 		return
 		
 	# Stop any existing animation
-	if lock_animation_tween and lock_animation_tween.is_valid():
-		lock_animation_tween.kill()
+	_cleanup_tweens()
 	
 	lock_animation_tween = create_tween()
 	lock_animation_tween.set_parallel(true)
@@ -70,8 +70,7 @@ func _animate_lock_ring_out():
 		return
 		
 	# Stop any existing animation
-	if lock_animation_tween and lock_animation_tween.is_valid():
-		lock_animation_tween.kill()
+	_cleanup_tweens()
 	
 	lock_animation_tween = create_tween()
 	
@@ -90,8 +89,12 @@ func _start_lock_ring_rotation():
 	if not lock_ring or not is_instance_valid(lock_ring) or not lock_ring.visible:
 		return
 		
+	# Kill any existing rotation tween
+	if rotation_tween and rotation_tween.is_valid():
+		rotation_tween.kill()
+		
 	# Create a continuous rotation animation
-	var rotation_tween = create_tween()
+	rotation_tween = create_tween()
 	rotation_tween.set_loops()  # Infinite loop
 	rotation_tween.tween_property(lock_ring, "rotation", lock_ring.rotation + TAU, 2.0)
 
@@ -139,6 +142,10 @@ func _cleanup_tweens():
 	if lock_animation_tween and lock_animation_tween.is_valid():
 		lock_animation_tween.kill()
 		lock_animation_tween = null
+	
+	if rotation_tween and rotation_tween.is_valid():
+		rotation_tween.kill()
+		rotation_tween = null
 
 func _spawn_explosion_effect():
 	# Spawn particle effect at enemy position
@@ -157,6 +164,9 @@ func grant_kill_reward():
 	# Don't save here - only save on successful escape
 	print("Enemy destroyed. +", reward, " credits, +", scrap_reward, " scrap. (Progress will be saved on escape)")
 
+func _exit_tree():
+	# Ensure tweens are cleaned up when the node is removed
+	_cleanup_tweens()
 
 func _input_event(viewport, event, shape_idx):
 	if (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:

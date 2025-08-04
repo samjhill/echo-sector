@@ -501,7 +501,63 @@ func show_removal_feedback(grid_position: Vector2i):
 	# Animate the feedback
 	var tween = create_tween()
 	tween.tween_property(feedback, "modulate:a", 0.0, 0.5)
-	tween.tween_callback(feedback.queue_free)
+	tween.tween_callback(func(): 
+		if feedback and is_instance_valid(feedback):
+			feedback.queue_free()
+	)
+
+func show_feedback(grid_position: Vector2i, message: String):
+	"""Show feedback message on a grid tile"""
+	# Safety check for grid position bounds
+	if grid_position.x < 0 or grid_position.x >= grid_size.x or grid_position.y < 0 or grid_position.y >= grid_size.y:
+		var error_msg = "Invalid grid position for feedback: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	# Safety check for grid_tile_buttons array
+	if grid_tile_buttons.size() <= grid_position.x or grid_tile_buttons[grid_position.x].size() <= grid_position.y:
+		var error_msg = "Grid tile buttons array bounds exceeded for feedback: %s, array size: %s" % [grid_position, grid_tile_buttons.size()]
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	var tile_button = grid_tile_buttons[grid_position.x][grid_position.y]
+	if tile_button == null:
+		var error_msg = "Tile button is null for feedback at position: %s" % grid_position
+		Logger.warning(error_msg, "StellarGridUI")
+		if error_display:
+			error_display.show_warning(error_msg)
+		return
+	
+	# Remove existing feedback
+	var existing_feedback = tile_button.get_node_or_null("Feedback")
+	if existing_feedback:
+		existing_feedback.queue_free()
+	
+	# Create new feedback
+	var feedback = Label.new()
+	feedback.name = "Feedback"
+	feedback.text = message
+	feedback.add_theme_font_size_override("font_size", 16)
+	feedback.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	feedback.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	feedback.add_theme_color_override("font_color", Color.WHITE)
+	feedback.modulate.a = 0.5
+	feedback.anchor_right = 1.0
+	feedback.anchor_bottom = 1.0
+	
+	tile_button.add_child(feedback)
+	
+	# Animate the feedback with safety check
+	var tween = create_tween()
+	tween.tween_property(feedback, "modulate:a", 0.0, 0.5)
+	tween.tween_callback(func(): 
+		if feedback and is_instance_valid(feedback):
+			feedback.queue_free()
+	)
 
 func show_long_press_indicator(grid_position: Vector2i, show: bool):
 	"""Show/hide visual indicator for long press"""
@@ -544,7 +600,7 @@ func show_long_press_indicator(grid_position: Vector2i, show: bool):
 		indicator.anchor_bottom = 1.0
 		tile_button.add_child(indicator)
 		
-		# Animate pulsing
+		# Animate pulsing with safety check
 		var tween = create_tween()
 		tween.set_loops()
 		tween.tween_property(indicator, "modulate:a", 0.6, 0.4)

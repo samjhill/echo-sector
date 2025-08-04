@@ -254,11 +254,11 @@ func _update_trajectory_line():
 			_animate_trajectory_line_out()
 
 func _animate_trajectory_line_in():
-	if not trajectory_line:
+	if not trajectory_line or not is_instance_valid(trajectory_line):
 		return
 		
 	# Stop any existing animation
-	if trajectory_animation_tween:
+	if trajectory_animation_tween and trajectory_animation_tween.is_valid():
 		trajectory_animation_tween.kill()
 	
 	trajectory_animation_tween = create_tween()
@@ -266,16 +266,29 @@ func _animate_trajectory_line_in():
 	trajectory_animation_tween.tween_property(trajectory_line, "modulate:a", 1.0, 0.2).set_ease(Tween.EASE_OUT)
 
 func _animate_trajectory_line_out():
-	if not trajectory_line:
+	if not trajectory_line or not is_instance_valid(trajectory_line):
 		return
 		
 	# Stop any existing animation
-	if trajectory_animation_tween:
+	if trajectory_animation_tween and trajectory_animation_tween.is_valid():
 		trajectory_animation_tween.kill()
 	
 	trajectory_animation_tween = create_tween()
 	trajectory_animation_tween.tween_property(trajectory_line, "modulate:a", 0.0, 0.2).set_ease(Tween.EASE_IN)
-	trajectory_animation_tween.tween_callback(func(): trajectory_line.visible = false)
+	trajectory_animation_tween.tween_callback(func(): 
+		if trajectory_line and is_instance_valid(trajectory_line):
+			trajectory_line.visible = false
+	)
+
+func _cleanup_tweens():
+	"""Clean up any active tweens to prevent warnings"""
+	if trajectory_animation_tween and trajectory_animation_tween.is_valid():
+		trajectory_animation_tween.kill()
+		trajectory_animation_tween = null
+
+func _exit_tree():
+	"""Ensure tweens are cleaned up when the node is removed"""
+	_cleanup_tweens()
 
 func _update_hit_effects(delta):
 	# Update flash effect

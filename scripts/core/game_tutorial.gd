@@ -132,19 +132,29 @@ func display_current_step():
 	Logger.info("Displaying tutorial step: %s" % current_step, "GameTutorial")
 
 func highlight_enemy(enemy: Node2D):
-	"""Highlight an enemy for the tutorial"""
-	if not tutorial_active or current_step != TutorialStep.ENEMY_HIGHLIGHT:
+	"""Highlight an enemy for tutorial purposes"""
+	if not is_instance_valid(enemy):
 		return
 		
 	highlighted_enemy = enemy
 	
-	# Create a pulsing highlight effect
+	# Create a pulsing highlight effect with safety checks
 	var highlight_tween = create_tween()
 	highlight_tween.set_loops()
 	highlight_tween.tween_property(enemy, "modulate", Color.YELLOW, 0.5)
 	highlight_tween.tween_property(enemy, "modulate", Color.WHITE, 0.5)
 	
 	Logger.info("Enemy highlighted for tutorial: %s" % enemy.name, "GameTutorial")
+
+func _cleanup_highlight_tween():
+	"""Clean up any active highlight tween"""
+	if highlighted_enemy and is_instance_valid(highlighted_enemy):
+		highlighted_enemy.modulate = Color.WHITE
+		highlighted_enemy = null
+
+func _exit_tree():
+	"""Ensure cleanup when the tutorial is destroyed"""
+	_cleanup_highlight_tween()
 
 func on_enemy_tapped(enemy: Node2D):
 	"""Handle when an enemy is tapped during tutorial"""
@@ -212,7 +222,7 @@ func complete_tutorial():
 	tutorial_active = false
 	
 	# Remove enemy highlight
-	if highlighted_enemy:
+	if highlighted_enemy and is_instance_valid(highlighted_enemy):
 		highlighted_enemy.modulate = Color.WHITE
 		highlighted_enemy = null
 	

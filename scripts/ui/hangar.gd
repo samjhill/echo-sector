@@ -31,22 +31,33 @@ func _ready():
 	_animate_ui_elements()
 
 func _animate_ui_elements():
-	# Start with all elements invisible
-	launch_button.modulate.a = 0.0
-	ship_loadout_button.modulate.a = 0.0
-	stellar_grid_button.modulate.a = 0.0
-	drone_panel.modulate.a = 0.0
-	upgrade_panel.modulate.a = 0.0
+	"""Animate UI elements with safety checks"""
+	# Set initial alpha values
+	if is_instance_valid(launch_button):
+		launch_button.modulate.a = 0.0
+	if is_instance_valid(ship_loadout_button):
+		ship_loadout_button.modulate.a = 0.0
+	if is_instance_valid(stellar_grid_button):
+		stellar_grid_button.modulate.a = 0.0
+	if is_instance_valid(drone_panel):
+		drone_panel.modulate.a = 0.0
+	if is_instance_valid(upgrade_panel):
+		upgrade_panel.modulate.a = 0.0
 	
 	# Animate them in with a slight delay
 	var tween = create_tween()
 	tween.set_parallel(true)
 	
-	tween.tween_property(launch_button, "modulate:a", 1.0, 0.3).set_delay(0.1)
-	tween.tween_property(ship_loadout_button, "modulate:a", 1.0, 0.3).set_delay(0.2)
-	tween.tween_property(stellar_grid_button, "modulate:a", 1.0, 0.3).set_delay(0.3)
-	tween.tween_property(drone_panel, "modulate:a", 1.0, 0.3).set_delay(0.4)
-	tween.tween_property(upgrade_panel, "modulate:a", 1.0, 0.3).set_delay(0.5)
+	if is_instance_valid(launch_button):
+		tween.tween_property(launch_button, "modulate:a", 1.0, 0.3).set_delay(0.1)
+	if is_instance_valid(ship_loadout_button):
+		tween.tween_property(ship_loadout_button, "modulate:a", 1.0, 0.3).set_delay(0.2)
+	if is_instance_valid(stellar_grid_button):
+		tween.tween_property(stellar_grid_button, "modulate:a", 1.0, 0.3).set_delay(0.3)
+	if is_instance_valid(drone_panel):
+		tween.tween_property(drone_panel, "modulate:a", 1.0, 0.3).set_delay(0.4)
+	if is_instance_valid(upgrade_panel):
+		tween.tween_property(upgrade_panel, "modulate:a", 1.0, 0.3).set_delay(0.5)
 
 func _on_launch_button_pressed():
 	"""Launch button pressed - check equipment and launch game"""
@@ -76,26 +87,37 @@ func _on_launch_button_pressed():
 	Logger.info("Launching game with equipment validation passed", "Hangar")
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.3)
-	tween.tween_callback(func(): get_tree().change_scene_to_file("res://scenes/game/node_2d.tscn"))
+	tween.tween_callback(func(): 
+		if is_instance_valid(self):
+			get_tree().change_scene_to_file("res://scenes/game/node_2d.tscn")
+	)
 
 func _on_ship_loadout_button_pressed():
+	if not is_instance_valid(ship_loadout_panel):
+		return
+		
 	ship_loadout_panel.visible = true
 	ship_loadout_panel.populate_equipment_screen()
 	
 	# Simple fade in for the equipment screen
 	ship_loadout_panel.modulate.a = 0.0
 	var tween = create_tween()
-	tween.tween_property(ship_loadout_panel, "modulate:a", 1.0, 0.3)
+	if is_instance_valid(ship_loadout_panel):
+		tween.tween_property(ship_loadout_panel, "modulate:a", 1.0, 0.3)
 
 func _open_equipment_screen_for_missing_equipment():
 	"""Open the equipment screen with notification about missing equipment"""
+	if not is_instance_valid(ship_loadout_panel):
+		return
+		
 	ship_loadout_panel.visible = true
 	ship_loadout_panel.populate_equipment_screen(true)  # Show missing equipment notification
 	
 	# Simple fade in for the equipment screen
 	ship_loadout_panel.modulate.a = 0.0
 	var tween = create_tween()
-	tween.tween_property(ship_loadout_panel, "modulate:a", 1.0, 0.3)
+	if is_instance_valid(ship_loadout_panel):
+		tween.tween_property(ship_loadout_panel, "modulate:a", 1.0, 0.3)
 
 func _on_stellar_grid_button_pressed():
 	if stellar_grid_panel == null:
@@ -104,12 +126,16 @@ func _on_stellar_grid_button_pressed():
 		# Connect to close event
 		stellar_grid_panel.visibility_changed.connect(_on_stellar_grid_visibility_changed)
 	
+	if not is_instance_valid(stellar_grid_panel):
+		return
+		
 	stellar_grid_panel.visible = true
 	
 	# Simple fade in for the stellar grid screen
 	stellar_grid_panel.modulate.a = 0.0
 	var tween = create_tween()
-	tween.tween_property(stellar_grid_panel, "modulate:a", 1.0, 0.3)
+	if is_instance_valid(stellar_grid_panel):
+		tween.tween_property(stellar_grid_panel, "modulate:a", 1.0, 0.3)
 
 func _on_settings_button_pressed():
 	"""Handle settings button press"""
@@ -119,13 +145,17 @@ func _on_settings_button_pressed():
 		Logger.error("Settings panel is null!", "Hangar")
 		return
 	
+	if not is_instance_valid(settings_panel):
+		return
+		
 	Logger.info("Settings panel found, making visible", "Hangar")
 	settings_panel.visible = true
 	
 	# Simple fade in for the settings screen
 	settings_panel.modulate.a = 0.0
 	var tween = create_tween()
-	tween.tween_property(settings_panel, "modulate:a", 1.0, 0.3)
+	if is_instance_valid(settings_panel):
+		tween.tween_property(settings_panel, "modulate:a", 1.0, 0.3)
 	
 	Logger.info("Settings panel visibility: %s" % settings_panel.visible, "Hangar")
 
@@ -157,6 +187,9 @@ func _on_scrap_changed(new_amount: int):
 
 func _animate_value_change(label: Label):
 	"""Animate a label when its value changes"""
+	if not is_instance_valid(label):
+		return
+		
 	# Create a subtle scale animation
 	var tween = create_tween()
 	tween.set_parallel(true)

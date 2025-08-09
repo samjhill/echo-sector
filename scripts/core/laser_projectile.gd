@@ -14,12 +14,17 @@ func _physics_process(delta):
 	position += direction.normalized() * speed * delta
 	
 func _on_body_entered(body):
-	if not is_instance_valid(body):
+	if not is_instance_valid(body) or body == self:
 		return
 		
 	if body.has_method("take_damage"):
 		body.take_damage(damage)
-	queue_free()  # Destroy the laser after hitting
+	# Disable further monitoring and free safely after signal emission
+	set_deferred("monitoring", false)
+	var shape = get_node_or_null("CollisionShape2D")
+	if shape:
+		shape.set_deferred("disabled", true)
+	call_deferred("queue_free")
 
 func _on_Timer_timeout():
 	queue_free()

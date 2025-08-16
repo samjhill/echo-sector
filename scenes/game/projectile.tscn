@@ -7,6 +7,8 @@
 radius = 13.0
 
 [node name="Projectile" type="Area2D"]
+collision_layer = 4
+collision_mask = 8
 script = ExtResource("1_a85iw")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]

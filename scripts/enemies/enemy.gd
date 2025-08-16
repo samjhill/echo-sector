@@ -120,22 +120,35 @@ func shoot_at(player: Node2D):
 	get_tree().current_scene.add_child(bullet)
 
 func take_damage(amount: int):
+	print("Enemy taking damage: ", amount, " health before: ", health)
 	health -= amount
+	print("Health after damage: ", health)
 
+	# Use call_deferred for damage number to avoid potential re-entrancy
 	if damage_number_scene:
-		var dmg_number = damage_number_scene.instantiate()
-		dmg_number.text = str(amount)
-		dmg_number.global_position = global_position
-		var current_scene = get_tree().current_scene
-		if current_scene and is_instance_valid(current_scene):
-			current_scene.add_child(dmg_number)
+		call_deferred("_spawn_damage_number", amount)
 
 	if health <= 0:
+		print("Enemy died, cleaning up")
 		_cleanup_tweens()
-		_spawn_explosion_effect()
-		grant_kill_reward()
-		enemy_killed.emit()  # Emit signal when killed
-		queue_free()
+		call_deferred("_handle_death")
+
+func _spawn_damage_number(amount: int):
+	if not damage_number_scene:
+		return
+	var dmg_number = damage_number_scene.instantiate()
+	dmg_number.text = str(amount)
+	dmg_number.global_position = global_position
+	var current_scene = get_tree().current_scene
+	if current_scene and is_instance_valid(current_scene):
+		current_scene.add_child(dmg_number)
+
+func _handle_death():
+	print("Handling enemy death")
+	_spawn_explosion_effect()
+	grant_kill_reward()
+	enemy_killed.emit()  # Emit signal when killed
+	queue_free()
 
 func _cleanup_tweens():
 	# Kill any active tweens to prevent warnings
@@ -159,10 +172,14 @@ func _spawn_explosion_effect():
 func grant_kill_reward():
 	var reward = 5  # or scale by difficulty later
 	var scrap_reward = 3  # base scrap reward
-	PlayerData.credits += reward
-	PlayerData.add_scrap(scrap_reward)
-	# Don't save here - only save on successful escape
-	print("Enemy destroyed. +", reward, " credits, +", scrap_reward, " scrap. (Progress will be saved on escape)")
+	
+	# Safely access PlayerData to avoid crashes
+	if PlayerData:
+		PlayerData.credits += reward
+		PlayerData.add_scrap(scrap_reward)
+		print("Enemy destroyed. +", reward, " credits, +", scrap_reward, " scrap. (Progress will be saved on escape)")
+	else:
+		print("PlayerData not available, skipping reward")
 
 func _exit_tree():
 	# Ensure tweens are cleaned up when the node is removed

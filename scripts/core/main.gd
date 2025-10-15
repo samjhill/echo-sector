@@ -12,6 +12,9 @@ var game_tutorial: GameTutorial = null
 # Error display system
 var error_display: ErrorDisplay = null
 
+# Fallback timer for tutorial completion
+var fallback_timer: Timer = null
+
 func _ready():
 	# Setup error display
 	setup_error_display()
@@ -30,7 +33,7 @@ func _ready():
 		Logger.info("Signal connection status: %s" % game_tutorial.tutorial_completed.is_connected(_on_tutorial_completed_and_start_spawning), "Main")
 		
 		# Add a fallback timer to check if spawning should have started
-		var fallback_timer = Timer.new()
+		fallback_timer = Timer.new()
 		fallback_timer.wait_time = 10.0  # 10 seconds
 		fallback_timer.timeout.connect(_check_spawning_status)
 		add_child(fallback_timer)
@@ -58,6 +61,11 @@ func _on_tutorial_completed_and_start_spawning():
 	Logger.info("Tutorial completed, starting enemy spawning", "Main")
 	spawn_enemy_timer()
 	
+	# Clean up fallback timer since tutorial completed normally
+	if fallback_timer:
+		fallback_timer.queue_free()
+		fallback_timer = null
+	
 	# Disconnect the signal to prevent multiple calls
 	if game_tutorial and game_tutorial.tutorial_completed.is_connected(_on_tutorial_completed_and_start_spawning):
 		game_tutorial.tutorial_completed.disconnect(_on_tutorial_completed_and_start_spawning)
@@ -81,6 +89,11 @@ func _check_spawning_status():
 		Logger.info("Tutorial is not active, spawning should have started", "Main")
 		# Force start spawning if it hasn't started
 		spawn_enemy_timer()
+	
+	# Clean up the fallback timer
+	if fallback_timer:
+		fallback_timer.queue_free()
+		fallback_timer = null
 
 func spawn_enemy_timer():
 	Logger.info("Creating enemy spawn timer", "Main")

@@ -28,38 +28,38 @@ func _create_statistics_labels():
 	
 	# Create enemies killed label if it doesn't exist
 	if not enemies_label:
-		enemies_label = Label.new()
-		enemies_label.name = "EnemiesKilledLabel"
-		enemies_label.layout_mode = 2
-		enemies_label.add_theme_font_size_override("font_size", 26)
-		enemies_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		enemies_label.add_theme_color_override("font_color", Color(1, 0.6, 0.6, 1))
-		main_container.add_child(enemies_label)
-		main_container.move_child(enemies_label, insert_index)
+		var new_enemies_label = Label.new()
+		new_enemies_label.name = "EnemiesKilledLabel"
+		new_enemies_label.layout_mode = 2
+		new_enemies_label.add_theme_font_size_override("font_size", 26)
+		new_enemies_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		new_enemies_label.add_theme_color_override("font_color", Color(1, 0.6, 0.6, 1))
+		main_container.add_child(new_enemies_label)
+		main_container.move_child(new_enemies_label, insert_index)
 		insert_index += 1
 	
 	# Create credits earned label if it doesn't exist
 	if not credits_label:
-		credits_label = Label.new()
-		credits_label.name = "CreditsEarnedLabel"
-		credits_label.layout_mode = 2
-		credits_label.add_theme_font_size_override("font_size", 26)
-		credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		credits_label.add_theme_color_override("font_color", Color(1, 0.9, 0.3, 1))
-		main_container.add_child(credits_label)
-		main_container.move_child(credits_label, insert_index)
+		var new_credits_label = Label.new()
+		new_credits_label.name = "CreditsEarnedLabel"
+		new_credits_label.layout_mode = 2
+		new_credits_label.add_theme_font_size_override("font_size", 26)
+		new_credits_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		new_credits_label.add_theme_color_override("font_color", Color(1, 0.9, 0.3, 1))
+		main_container.add_child(new_credits_label)
+		main_container.move_child(new_credits_label, insert_index)
 		insert_index += 1
 	
 	# Create scrap collected label if it doesn't exist
 	if not scrap_label:
-		scrap_label = Label.new()
-		scrap_label.name = "ScrapCollectedLabel"
-		scrap_label.layout_mode = 2
-		scrap_label.add_theme_font_size_override("font_size", 26)
-		scrap_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		scrap_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 1))
-		main_container.add_child(scrap_label)
-		main_container.move_child(scrap_label, insert_index)
+		var new_scrap_label = Label.new()
+		new_scrap_label.name = "ScrapCollectedLabel"
+		new_scrap_label.layout_mode = 2
+		new_scrap_label.add_theme_font_size_override("font_size", 26)
+		new_scrap_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		new_scrap_label.add_theme_color_override("font_color", Color(0.8, 0.8, 0.8, 1))
+		main_container.add_child(new_scrap_label)
+		main_container.move_child(new_scrap_label, insert_index)
 
 func _update_statistics_display():
 	var main_container = $MainContainer

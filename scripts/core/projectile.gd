@@ -5,20 +5,17 @@ extends Area2D
 var direction: Vector2 = Vector2.ZERO
 
 func _ready():
-	print("Spawned with direction: ", direction)
+	pass
 
 func _physics_process(delta):
 	position += direction * speed * delta
 
 func _on_body_entered(body):
-	print("Projectile hit body: ", body)
 	if not is_instance_valid(body) or body == self:
-		print("Invalid body or self, skipping")
 		return
 
 	# Only interact with valid damage receivers (e.g., enemies)
 	if body.has_method("take_damage") and body.is_in_group("enemies"):
-		print("Dealing damage to enemy: ", body.name)
 		body.take_damage(damage)
 		# Disable further monitoring to prevent re-entrancy during signal emission
 		set_deferred("monitoring", false)
@@ -26,5 +23,3 @@ func _on_body_entered(body):
 		if shape:
 			shape.set_deferred("disabled", true)
 		call_deferred("queue_free")
-	else:
-		print("Body has no take_damage method or not an enemy: ", body.get_groups())

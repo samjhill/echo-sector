@@ -120,16 +120,13 @@ func shoot_at(player: Node2D):
 	get_tree().current_scene.add_child(bullet)
 
 func take_damage(amount: int):
-	print("Enemy taking damage: ", amount, " health before: ", health)
 	health -= amount
-	print("Health after damage: ", health)
 
 	# Use call_deferred for damage number to avoid potential re-entrancy
 	if damage_number_scene:
 		call_deferred("_spawn_damage_number", amount)
 
 	if health <= 0:
-		print("Enemy died, cleaning up")
 		_cleanup_tweens()
 		call_deferred("_handle_death")
 
@@ -144,7 +141,6 @@ func _spawn_damage_number(amount: int):
 		current_scene.add_child(dmg_number)
 
 func _handle_death():
-	print("Handling enemy death")
 	_spawn_explosion_effect()
 	grant_kill_reward()
 	enemy_killed.emit()  # Emit signal when killed
@@ -177,9 +173,8 @@ func grant_kill_reward():
 	if PlayerData:
 		PlayerData.credits += reward
 		PlayerData.add_scrap(scrap_reward)
-		print("Enemy destroyed. +", reward, " credits, +", scrap_reward, " scrap. (Progress will be saved on escape)")
 	else:
-		print("PlayerData not available, skipping reward")
+		pass  # PlayerData not available, skip reward silently
 
 func _exit_tree():
 	# Ensure tweens are cleaned up when the node is removed
@@ -187,7 +182,6 @@ func _exit_tree():
 
 func _input_event(viewport, event, shape_idx):
 	if (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:
-		print("Enemy tapped:", self.name)
 		var player = get_tree().get_first_node_in_group("players")
 		if player and player.has_method("lock_on_target"):
 			player.lock_on_target(self)
